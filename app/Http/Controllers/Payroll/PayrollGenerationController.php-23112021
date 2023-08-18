@@ -1,0 +1,1245 @@
+<?php
+
+namespace App\Http\Controllers\Payroll;
+
+use App\Http\Controllers\Controller;
+use App\Models\Attendance\Process_attendance;
+use App\Models\Employee\Employee_pay_structure;
+use App\Models\Leave\Gpf_details;
+use App\Models\Leave\Gpf_opening_balance;
+use App\Models\Leave\Nps_details;
+use App\Models\LeaveApprover\Gpf_loan_apply;
+use App\Models\LeaveApprover\Leave_apply;
+use App\Models\Masters\Gpf_rate_master;
+use App\Models\Masters\Rate_details;
+use App\Models\Masters\Rate_master;
+use App\Models\Masters\Role_authorization;
+use App\Models\Payroll\Payroll_detail;
+use App\Models\Role\Employee;
+use Illuminate\Http\Request;
+use View;
+use Validator;
+use Session;
+use App\ProcessAttendance;
+use App\Rate;
+
+class PayrollGenerationController extends Controller
+{
+
+	public function payrollDashboard()
+	{
+		if (!empty(Session::get('admin'))) {
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+
+			return View('payroll/dashboard', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function getPayroll()
+	{
+
+		if (!empty(Session::get('admin'))) {
+
+			$data['payroll_rs'] = Payroll_detail::get();
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+				 $data['rate_master'] = Rate_master::get();
+			return view('payroll/view-payroll-generation', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function viewPayroll()
+	{
+		if (!empty(Session::get('admin'))) {
+
+
+			$data['Employee'] = Employee::where('status', '=', 'active')->orderBy('emp_fname', 'asc')->get();
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+			//return view('pis/add-payroll-generation',$data);
+			return view('payroll/single-payroll-generation', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function empPayrollAjax($empid, $month, $year)
+	{
+		if (!empty(Session::get('admin'))) {
+
+			$mnth_yr = $month . '/' . $year;
+
+			//$tomonthyr=date("Y-m-t");
+			//$formatmonthyr=date("Y-m-01");
+			$tomonthyr = $year . "-" . $month . "-31";
+			$formatmonthyr = $year . "-" . $month . "-01";
+
+			$employee_rs = Employee::leftJoin('employee_pay_structures', 'employee_pay_structures.employee_code', '=', 'employees.emp_code')
+				->where('employees.emp_code', '=',  $empid)
+				->where('employees.emp_status', '!=', 'EX-EMPLOYEE')
+				->select('employees.*', 'employee_pay_structures.*')->first();
+
+			$leave_rs = Leave_apply::leftJoin('leave_types', 'leave_types.id', '=', 'leave_applies.leave_type')
+				->where('leave_applies.employee_id', '=', $empid)
+				->where('leave_applies.status', '=', 'APPROVED')
+				->where('leave_applies.from_date', '>=', $formatmonthyr)
+				->where('leave_applies.to_date', '<=', $tomonthyr)
+				->select('leave_applies.*', 'leave_types.leave_type_name')
+				->get();
+
+			$process_attendance = Process_attendance::where('process_attendances.employee_code', '=',  $empid)
+				->where('process_attendances.month_yr', '=', $mnth_yr)
+				->first();
+			//->toSql();
+
+$rate_rs = Rate_details::leftJoin('rate_masters', 'rate_masters.id', '=', 'rate_details.rate_id')
+                ->select('rate_details.*', 'rate_masters.head_name','rate_masters.head_type')
+					 ->where('rate_details.from_date', '>=', date('Y-01-01'))
+							 ->where('rate_details.to_date', '<=', date('Y-12-31'))
+							 
+                ->get();
+				
+			echo json_encode(array($employee_rs, $leave_rs, $process_attendance, $rate_rs));
+		} else {
+			return redirect('/');
+		}
+	}
+
+
+	public function getPayrollallemployee()
+	{
+
+		if (!empty(Session::get('admin'))) {
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+			$data['payroll_rs'] = Payroll_detail::get();
+			 $data['rate_master'] = Rate_master::get();
+			
+			return view('payroll/payroll-generation-all-employee', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+	public function addPayrollallemployee()
+	{
+		if (!empty(Session::get('admin'))) {
+
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+
+			$data['result'] = '';
+
+			return view('payroll/generate-payroll-all', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function listPayrollallemployee(Request $request)
+	{
+//die(phpinfo());
+		if (!empty(Session::get('admin'))) {
+			$email = Session::get('adminusernmae');
+			$Roledata = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+			$payrolldate = explode('/', $request['month_yr']);
+			$payroll_date = "0" . ($payrolldate[0] - 2);
+			$origDate = $payroll_date . "/" . $payrolldate[1];
+			//$current_month_days = cal_days_in_month(CAL_GREGORIAN, $payrolldate[0], $payrolldate[1]);
+			
+			$datestring = $payrolldate[1] . '-' . $payrolldate[0] . '-01';
+            // Converting string to date
+            $date = strtotime($datestring);
+			$lastdate = date("Y-m-d", strtotime(date("Y-m-t", $date)));
+            $current_month_days =date("t", strtotime(date("Y-m-t", $date)));
+            //dd($current_month_days);
+
+			$tomonthyr = $payrolldate[1] . "-" . $payroll_date . "-" . $current_month_days;
+			$formatmonthyr = $payrolldate[1] . "-" . $payroll_date . "-01";
+
+			$rate_rs = Rate_master::leftJoin('rate_details', 'rate_details.rate_id', '=', 'rate_masters.id')
+				->select('rate_details.*', 'rate_masters.head_name')
+				->get();
+
+			$result = '';
+
+			$emplist = Employee::where('status', '=', 'active')
+				->where('emp_status', '!=', 'TEMPORARY')
+				->where('employees.emp_status', '!=', 'EX-EMPLOYEE')
+				->orderBy('emp_fname', 'asc')
+				->get();
+
+
+			foreach ($emplist as $mainkey => $emcode) {
+
+
+				$process_attendance = Process_attendance::where('process_attendances.employee_code', '=', $emcode->emp_code)
+					->where('process_attendances.month_yr', '=', $origDate)
+					->first();
+
+
+				$employee_rs = Employee::leftJoin('employee_pay_structures', 'employee_pay_structures.employee_code', '=', 'employees.emp_code')
+					->where('employees.emp_code', '=',  $emcode->emp_code)
+					->select('employees.*', 'employee_pay_structures.*')
+					->first();
+
+
+				$leave_rs = Leave_apply::leftJoin('leave_types', 'leave_types.id', '=', 'leave_applies.leave_type')
+					->where('leave_applies.employee_id', '=', $emcode->emp_code)
+					->where('leave_applies.status', '=', 'APPROVED')
+					->whereBetween('leave_applies.from_date', array($formatmonthyr, $tomonthyr))
+					->orwhereBetween('leave_applies.to_date', array($formatmonthyr, $tomonthyr))
+					->select('leave_applies.*', 'leave_types.leave_type_name')
+					->get();
+
+				$previous_payroll = Payroll_detail::where('employee_id', '=', $emcode->emp_code)
+					//->where('month_yr','<',$request['month_yr'])
+					->orderBy('month_yr', 'desc')
+					->first();
+
+
+
+				$tot_cl = $tot_el = $tot_hpl = $tot_rh = $tot_cml = $tot_eol = $tot_ml = $tot_pl = $tot_ccl = $tot_tl = 0;
+				foreach ($leave_rs as $ky => $val) {
+
+					if ($val->employee_id == $emcode->emp_code) {
+
+						if ($val->leave_type_name == 'CASUAL LEAVE') {
+
+
+							$frommonth = date("m", strtotime($val->from_date));
+							$tomonth = date("m", strtotime($val->to_date));
+							if ($frommonth == $tomonth) {
+								$tot_cl = $val->no_of_leave;
+							} else {
+
+								$to = \Carbon\Carbon::createFromFormat('Y-m-d', $tomonthyr);
+								$from = \Carbon\Carbon::createFromFormat('Y-m-d', $val->to_date);
+								$diff_in_days = $to->diffInDays($val->from_date);
+								$tot_cl = ($diff_in_days) + 1;
+							}
+						}
+
+						if ($val->leave_type_name == 'EARNED LEAVE') {
+							$frommonth = date("m", strtotime($val->from_date));
+							$tomonth = date("m", strtotime($val->to_date));
+							if ($frommonth == $tomonth) {
+								$tot_el = $val->no_of_leave;
+							} else {
+								$to = \Carbon\Carbon::createFromFormat('Y-m-d', $tomonthyr);
+								$from = \Carbon\Carbon::createFromFormat('Y-m-d', $val->to_date);
+								$diff_in_days = $to->diffInDays($val->from_date);
+								$tot_el = ($diff_in_days) + 1;
+							}
+						}
+
+						if ($val->leave_type_name == 'HALF PAY LEAVE') {
+
+							$frommonth = date("m", strtotime($val->from_date));
+							$tomonth = date("m", strtotime($val->to_date));
+							if ($frommonth == $tomonth) {
+								$tot_hpl = $val->no_of_leave;
+							} else {
+								$to = \Carbon\Carbon::createFromFormat('Y-m-d', $tomonthyr);
+								$from = \Carbon\Carbon::createFromFormat('Y-m-d', $val->to_date);
+								$diff_in_days = $to->diffInDays($val->from_date);
+								$tot_hpl = ($diff_in_days) + 1;
+							}
+						}
+
+						if ($val->leave_type_name == 'MEDICAL LEAVE') {
+							$frommonth = date("m", strtotime($val->from_date));
+							$tomonth = date("m", strtotime($val->to_date));
+							if ($frommonth == $tomonth) {
+								$tot_ml = $val->no_of_leave;
+							} else {
+								$to = \Carbon\Carbon::createFromFormat('Y-m-d', $tomonthyr);
+								$from = \Carbon\Carbon::createFromFormat('Y-m-d', $val->to_date);
+								$diff_in_days = $to->diffInDays($val->from_date);
+								$tot_ml = ($diff_in_days) + 1;
+							}
+						}
+
+
+						if ($val->leave_type_name == 'TOUR LEAVE') {
+							$frommonth = date("m", strtotime($val->from_date));
+							$tomonth = date("m", strtotime($val->to_date));
+							if ($frommonth == $tomonth) {
+								$tot_tl = $val->no_of_leave;
+							} else {
+								$to = \Carbon\Carbon::createFromFormat('Y-m-d', $tomonthyr);
+								$from = \Carbon\Carbon::createFromFormat('Y-m-d', $val->to_date);
+								$diff_in_days = $to->diffInDays($val->from_date);
+								$tot_tl = ($diff_in_days) + 1;
+							}
+						}
+					}
+				}
+
+
+				if (empty($process_attendance)) {
+
+					$calculate_basic_salary = $employee_rs->basic_pay;
+					$no_of_working_days = 0;
+					$no_of_present = 0;
+					$no_of_days_absent = 0;
+					$no_of_days_salary = 0;
+				} else {
+
+					$calculate_basic_salary = round(($employee_rs->basic_pay / $current_month_days) * ($process_attendance->no_of_working_days - $process_attendance->no_of_days_absent));
+
+					$no_of_working_days = $process_attendance->no_of_working_days;
+					$no_of_present = $process_attendance->no_of_present;
+					$no_of_days_absent = $process_attendance->no_of_days_absent;
+					$no_of_days_salary = $process_attendance->no_of_days_salary;
+				}
+
+				$ta_rate = 0;
+				$da_on_ta = 0;
+
+
+
+				$ta_value = Rate_details::where('rate_id', '=', 3)
+					->where(function ($query) use ($calculate_basic_salary) {
+						$query->where('min_basic', '<=', $calculate_basic_salary);
+						$query->where('max_basic', '>=', $calculate_basic_salary);
+					})
+					->first();
+
+				$da_value = Rate_details::where('rate_id', '=', '2')->first();
+
+				if ($emcode->emp_code == '6678') {
+
+					$ta_rate = 3600;
+					$da_on_ta = 612;
+				} else {
+
+					if ($ta_value) {
+						if ($no_of_days_absent > 0) {
+
+							$absent_deduction = round(($ta_value->inrupees / $current_month_days) * $no_of_days_absent);
+
+							if ($emcode->emp_physical_status == 'yes') {
+								$ta_rate = round(($ta_value->inrupees - $absent_deduction) * 2);
+							} else {
+								$ta_rate = round(($ta_value->inrupees - $absent_deduction));
+							}
+						} else {
+
+							if ($emcode->emp_physical_status == 'yes') {
+								$ta_rate = round($ta_value->inrupees * 2);
+							} else {
+
+								$ta_rate = $ta_value->inrupees;
+							}
+						}
+
+						$da_on_ta = round($ta_rate * $da_value->inpercentage / 100);
+					}
+				}
+
+				foreach ($rate_rs as $ratekey => $rateval) {
+
+
+					if ($rateval->head_name == 'HRA') {
+						if ($employee_rs->hra == '1') {
+							$actual_hra = $calculate_basic_salary * $rateval->inpercentage / 100;
+							if ($actual_hra <= 5400) {
+								$hra = '5400';
+							} else {
+								$hra = $actual_hra;
+							}
+						} else {
+							$hra = 0;
+						}
+					}
+
+
+					if ($rateval->head_name == 'DA') {
+
+						if ($employee_rs->da == '1') {
+							$da = round($calculate_basic_salary * $rateval->inpercentage / 100);
+						} else {
+
+							$da = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'LTC') {
+						if ($employee_rs->ltc == '1') {
+							$ltc = $rateval->inpercentage;
+						} else {
+							$ltc = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'CEA') {
+						if ($employee_rs->cea == '1') {
+							$cea = $rateval->inpercentage;
+						} else {
+							$cea = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'TR_A') {
+						if ($employee_rs->travelling_allowance == '1') {
+							$tr_a = $rateval->inpercentage;
+						} else {
+							$tr_a = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'DLA') {
+						if ($employee_rs->daily_allowance == '1') {
+							$dla = $rateval->inpercentage;
+						} else {
+							$dla = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'ADV') {
+						if ($employee_rs->advance == '1') {
+							$adv = $rateval->inpercentage;
+						} else {
+							$adv = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'ADJ_ADV') {
+						if ($employee_rs->adjustment_advance == '1') {
+							$adjadv = $rateval->inpercentage;
+						} else {
+							$adjadv = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'MR') {
+						if ($employee_rs->medical_reimbursement == '1') {
+							$mr = $rateval->inpercentage;
+						} else {
+							$mr = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'SA') {
+						if ($employee_rs->spcl_allowance == '1') {
+
+							//$sa=$rateval->inpercentage;
+							if (!empty($previous_payroll->emp_spcl)) {
+								$sa = $previous_payroll->emp_spcl;
+							} else {
+								$sa = 0;
+							}
+						} else {
+							$sa = 0;
+						}
+					}
+
+					if ($rateval->head_name == 'CHA') {
+						if ($employee_rs->cash_handling_allowance == '1') {
+							if (!empty($previous_payroll->emp_cash_handle)) {
+								$cha = $previous_payroll->emp_cash_handle;
+							} else {
+								$cha = 0;
+							}
+						} else {
+							$cha = 0;
+						}
+					}
+
+
+					if ($rateval->head_name == 'NPS') {
+
+						if ($employee_rs->nps == '1') {
+							$nps = $calculate_basic_salary + $da;
+							$tot_nps = round($nps * $rateval->inpercentage / 100);
+						} else {
+
+							$tot_nps = 0;
+						}
+					}
+
+
+					if ($rateval->head_name == 'GSLI') {
+
+						if ($employee_rs->gsli == '1') {
+							//$gsli=$rateval->inrupees;
+							if (!empty($previous_payroll->emp_gslt)) {
+								$gsli = $previous_payroll->emp_gslt;
+							} else {
+								$gsli = 0;
+							}
+						} else {
+							$gsli = 0;
+						}
+					}
+
+
+					if ($rateval->head_name == 'GPF') {
+
+						if ($employee_rs->gpf == '1') {
+
+							if (!empty($previous_payroll->emp_gpf)) {
+								$gpf = $previous_payroll->emp_gpf;
+							} else {
+								$gpf = 0;
+							}
+						} else {
+							$gpf = 0;
+						}
+					}
+
+
+
+
+					if ($employee_rs->income_tax == '1') {
+
+						if (!empty($previous_payroll->emp_income_tax)) {
+							$income_tax = $previous_payroll->emp_income_tax;
+						} else {
+							$income_tax = 0;
+						}
+					} else {
+						$income_tax = 0;
+					}
+
+					if ($employee_rs->cess == '1') {
+						//$cess=$rateval->inpercentage;
+						if (!empty($previous_payroll->emp_cess)) {
+							$cess = $previous_payroll->emp_cess;
+						} else {
+							$cess = 0;
+						}
+					} else {
+						$cess = 0;
+					}
+
+
+
+					if ($employee_rs->other_deduction == '1') {
+
+						if (!empty($previous_payroll->other_deduction)) {
+							$other2 = $previous_payroll->other_deduction;
+						} else {
+							$other2 = 0;
+						}
+					} else {
+						$other2 = 0;
+					}
+				}
+
+				$total_gross = round($calculate_basic_salary + $da + $hra + $da_on_ta + $ta_rate + $ltc + $cea + $tr_a + $dla + $adv + $adjadv + $mr + $sa + $cha);
+
+				foreach ($rate_rs as $ratekey => $rateval) {
+					if ($rateval->head_name == 'PTAX') {
+						if ($employee_rs->professional_tax == '1') {
+
+							if (($total_gross >= $rateval->min_basic) && ($total_gross <= $rateval->max_basic)) {
+								$ptax = $rateval->inrupees;
+							}
+						} else {
+							$ptax = 0;
+						}
+					}
+				}
+
+				$total_deduction = round($tot_nps + $gsli + $ptax + $gpf + $income_tax + $cess + $other2);
+				$netsalary = round($total_gross - $total_deduction);
+
+				$result .= '<tr id="' . $emcode->emp_code . '">
+								<td><div class="checkbox"><label><input type="checkbox" name="empcode_check[]" value="' . $emcode->emp_code . '" class="checkhour"></label></div></td>
+								<td><input type="text" readonly class="form-control" name="emp_code' . $emcode->emp_code . '" style="width:100px;" value="' . $employee_rs->emp_code . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_name' . $emcode->emp_code . '" style="width:100px;" value="' . $employee_rs->emp_fname . ' ' . $employee_rs->emp_mname . ' ' . $employee_rs->emp_lname . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_designation' . $emcode->emp_code . '" style="width:100px;" value="' . $employee_rs->emp_designation . '"></td>
+								<td><input type="text" readonly class="form-control" name="month_yr' . $emcode->emp_code . '" style="width:70px;" value="' . $request['month_yr'] . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_basic_pay' . $emcode->emp_code . '" style="width:100px;" value="' . $calculate_basic_salary . '"  id="emp_basic_pay_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" readonly class="form-control" name="emp_no_of_working' . $emcode->emp_code . '" value="' . $no_of_working_days . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_no_of_present' . $emcode->emp_code . '" value="' . $no_of_present . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_no_of_days_absent' . $emcode->emp_code . '" value="' . $no_of_days_absent . '"></td>
+				  				<td><input type="text" readonly class="form-control" name="emp_no_of_days_salary' . $emcode->emp_code . '" value="' . $no_of_days_salary . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_cl' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_cl . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_el' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_el . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_hpl' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_hpl . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_rh' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_rh . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_cml' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_cml . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_eol' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_eol . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_lnd' . $emcode->emp_code . '" value="0"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_ml' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_ml . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tot_pl' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_pl . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_totccl' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_ccl . '"></td>
+								<td><input type="text" readonly class="form-control" name="emp_tour_leave' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_tl . '"></td>
+								<td><input type="text" class="form-control" name="emp_da' . $emcode->emp_code . '" value="' . $da . '" readonly ></td>
+								<td><input type="text" class="form-control" name="emp_hra' . $emcode->emp_code . '" value="' . $hra . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_ta' . $emcode->emp_code . '" value="' . $ta_rate . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_daonta' . $emcode->emp_code . '" value="' . $da_on_ta . '" readonly></td>
+								<td><input type="text" class="form-control" id="ltc_' . $emcode->emp_code . '" name="emp_ltc' . $emcode->emp_code . '" value="' . $ltc . '"></td>
+								<td><input type="text" class="form-control" name="emp_cha' . $emcode->emp_code . '" value="' . $cha . '" id="cha_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" class="form-control" name="emp_tra' . $emcode->emp_code . '" value="' . $tr_a . '" id="tra_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_dla' . $emcode->emp_code . '" value="' . $dla . '" id="dla_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" class="form-control" name="emp_spcl_allowance' . $emcode->emp_code . '" value="' . $sa . '" id="spcl_allowance_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_adv' . $emcode->emp_code . '" value="' . $adv . '" id="adv_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_adjadv' . $emcode->emp_code . '" value="' . $adjadv . '" id="adjadv_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" class="form-control" name="emp_mr' . $emcode->emp_code . '" value="' . $mr . '" id="mr_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" class="form-control" name="emp_other1' . $emcode->emp_code . '" value="0" style="width:50px;" id="other1_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_gpf' . $emcode->emp_code . '" style="width:50px;" value="' . $gpf . '" readonly ></td>
+								<td><input type="text" class="form-control" name="emp_nps' . $emcode->emp_code . '" style="width:50px;" value="' . $tot_nps . '" readonly id="nps_' . $emcode->emp_code . '" ></td>
+								<td><input type="text" class="form-control" name="emp_cpf' . $emcode->emp_code . '" style="width:50px;" value="0" readonly id="cpf_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_gsli' . $emcode->emp_code . '" style="width:50px;" value="' . $gsli . '" id="gsli_' . $emcode->emp_code . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_income_tax' . $emcode->emp_code . '" style="width:50px;" value="' . $income_tax . '" id="income_tax_' . $emcode->emp_code . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_cess' . $emcode->emp_code . '" value="' . $cess . '" id="cess_' . $emcode->emp_code . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_ptax' . $emcode->emp_code . '" value="' . $ptax . '" id="tax_' . $emcode->emp_code . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_other2' . $emcode->emp_code . '" style="width:50px;" value="' . $other2 . '" id="other2_' . $emcode->emp_code . '"></td>
+								<td><input type="text" class="form-control" name="emp_total_gross' . $emcode->emp_code . '" style="width:120px;" value="' . $total_gross . '" id="emp_total_gross_' . $emcode->emp_code . '" readonly ></td>
+								<td><input type="text" class="form-control" name="emp_total_deduction' . $emcode->emp_code . '" style="width:120px;" value="' . $total_deduction . '" id="emp_total_deduction_' . $emcode->emp_code . '" readonly></td>
+								<td><input type="text" class="form-control" name="emp_net_salary' . $emcode->emp_code . '" style="width:120px;" value="' . $netsalary . '" id="emp_net_salary_' . $emcode->emp_code . '" readonly></td>
+					</tr> ';
+				// print_r($result);
+				// die();
+			}
+			// print_r($result);
+			// die();
+			$month_yr_new = $request['month_yr'];
+			return view('payroll/generate-payroll-all', compact('result', 'Roledata', 'month_yr_new'));
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function getProcessPayroll()
+	{
+		if (!empty(Session::get('admin'))) {
+			$data['monthlist'] = Payroll_detail::select('month_yr')->distinct('month_yr')->get();
+			$data['process_payroll'] = "";
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+				 $data['rate_master'] = Rate_master::get();
+			return view('payroll/vw-process-payroll', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function vwProcessPayroll(Request $request)
+	{
+		if (!empty(Session::get('admin'))) {
+
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+			$data['process_payroll'] = Payroll_detail::where('month_yr', '=', $request['month_yr'])
+				->where('proces_status', '=', 'process')
+				->get();
+
+			// print_r(count($data['process_payroll']));
+			// die();
+
+			if (count($data['process_payroll']) == 0) {
+				// print_r('Empty');
+				// die();
+				Session::flash('error', 'No Data Found.');
+			}
+ $data['rate_master'] = Rate_master::get();
+			$data['monthlist'] = Payroll_detail::select('month_yr')->distinct('month_yr')->get();
+
+			return view('payroll/vw-process-payroll', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function addbalgpfemployee()
+	{
+		if (!empty(Session::get('admin'))) {
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+
+			return view('payroll/opening-bal-generation', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function listbalgpfemployee(Request $request)
+	{
+
+		if (!empty(Session::get('admin'))) {
+
+			$employeelist = Employee::where('status', '=', 'active')
+				->where('emp_status', '!=', 'TEMPORARY')
+				->where('emp_status', '!=', 'EX-EMPLOYEE')
+				->where('emp_pf_type', '=', 'gpf')
+				->orderBy('emp_fname', 'asc')
+
+
+				->get();
+
+			$opening_balance = 0;
+			foreach ($employeelist as $employee) {
+				$data['month_yr'] = $request['month_yr'];
+				$employeegpf = Gpf_opening_balance::where('month_yr', '=', $request['month_yr'])
+					->where('employee_id', '=', $employee->emp_code)
+					->get();
+
+
+				if (count($employeegpf) != '0') {
+
+					$opening_balance = $employeegpf[0]->opening_balance;
+				} else {
+					$opening_balance = '0';
+				}
+
+
+
+				$emp_name = $employee->emp_fname . ' ' . $employee->emp_mname . ' ' . $employee->emp_lname;
+
+
+				$data['employee_gpf'][] = array('emp_name' => $emp_name, 'emp_designation' => $employee->emp_designation, 'emp_code' => $employee->emp_code, 'opening_balance' => $opening_balance);
+			}
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+			return view('payroll/generate-gpf-bal-all', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function addPayrollbalgpfemployee()
+	{
+
+		if (!empty(Session::get('admin'))) {
+
+			$data['employeelist'] = Employee::where('status', '=', 'active')
+				->where('emp_status', '!=', 'TEMPORARY')
+				->where('emp_status', '!=', 'EX-EMPLOYEE')
+				->where('emp_pf_type', '=', 'gpf')
+				->orderBy('emp_fname', 'asc')
+
+
+				->get();
+			$data['employeegpf'] = Gpf_opening_balance::get();
+
+
+			return view('payroll/generate-gpf-bal-all', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function listPayrollbalgpfemployee(Request $request)
+	{
+		if (!empty(Session::get('admin'))) {
+
+			Gpf_opening_balance::where('month_yr', '=', $request['month_yr'])
+				->delete();
+			foreach ($request->emp_code as $key => $value) {
+
+
+				if (!empty($value)) {
+
+					$data['employee_id'] = $value;
+					$data['emp_name'] = $request->emp_name[$key];
+					$data['emp_designation'] = $request->emp_designation[$key];
+					$data['month_yr'] = $request['month_yr'];
+					$data['crated_time'] = date('Y-m-d');
+					$data['opening_balance'] = $request->open_bal[$key];
+					Gpf_opening_balance::insert($data);
+				}
+			}
+			Session::flash('message', 'GPF Opening Balance Successfully Saved.');
+			$employeelist = Employee::where('status', '=', 'active')
+				->where('emp_status', '!=', 'TEMPORARY')
+				->where('emp_status', '!=', 'EX-EMPLOYEE')
+				->where('emp_pf_type', '=', 'gpf')
+				->orderBy('emp_fname', 'asc')
+
+
+				->get();
+
+			foreach ($employeelist as $employee) {
+				$data['month_yr'] = $request['month_yr'];
+				$employeegpf = Gpf_opening_balance::where('month_yr', '=', $request['month_yr'])
+					->where('employee_id', '=', $employee->emp_code)
+					->get();
+
+				if (!empty($employeegpf)) {
+					$opening_balance = $employeegpf[0]->opening_balance;
+				} else {
+					$opening_balance = '0';
+				}
+				$emp_name = $employee->emp_fname . ' ' . $employee->emp_mname . ' ' . $employee->emp_lname;
+
+
+				$data['employee_gpf'][] = array('emp_name' => $emp_name, 'emp_designation' => $employee->emp_designation, 'emp_code' => $employee->emp_code, 'opening_balance' => $opening_balance);
+			}
+			$email = Session::get('adminusernmae');
+			$data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+				->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+				->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+				->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+				->where('member_id', '=', $email)
+				->get();
+
+			return view('payroll/generate-gpf-bal-all', $data);
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function updateProcessPayroll(Request $request)
+	{
+
+		if (!empty(Session::get('admin'))) {
+
+		if(isset($request['payroll_id']) && count($request['payroll_id'])!=0){
+			foreach ($request['payroll_id'] as $payroll) {
+				$dataUpdate = Payroll_detail::where('id', '=', $payroll)
+					->update(['proces_status' => 'completed']);
+			}
+			Session::flash('message', 'Pay Detail Save Successfully.');
+}else{
+	Session::flash('error', 'No Pay Detail is Selected.');
+}
+			return redirect('payroll/vw-process-payroll');
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function savePayrollDetails(Request $request)
+	{
+		if (!empty(Session::get('admin'))) {
+
+
+			if (empty($request->emp_gross_salary)) {
+				Session::flash('message', 'Gross Salary Cannot be Blank.');
+				return redirect('payroll/vw-payroll-generation');
+			}
+
+			if (empty($request->emp_total_deduction)) {
+
+				Session::flash('message', 'Total Salary Cannot be Blank.');
+				return redirect('payroll/vw-payroll-generation');
+			}
+
+			if (empty($request->emp_net_salary)) {
+
+				Session::flash('message', 'Net Salary Cannot be Blank.');
+				return redirect('payroll/vw-payroll-generation');
+			}
+
+
+			$monthyr = $request->month_yr;
+			$mnt_yr = date('m/Y', strtotime("$monthyr"));
+
+
+			$data['employee_id'] = $request->empname;
+			$data['emp_name'] = $request->emp_name;
+			$data['emp_designation'] = $request->emp_designation;
+			$data['emp_basic_pay'] = $request->emp_basic_pay;
+			$data['month_yr'] = $mnt_yr;
+			$data['emp_present_days'] = $request->emp_present_days;
+			$data['emp_cl'] = $request->emp_cl;
+			$data['emp_el'] = $request->emp_el;
+			$data['emp_hpl'] = $request->emp_hpl;
+			$data['emp_absent_days'] = $request->emp_absent_days;
+			$data['emp_rh'] = $request->emp_rh;
+			$data['emp_cml'] = $request->emp_cml;
+			$data['emp_eol'] = $request->emp_eol;
+			$data['emp_lnd'] = $request->emp_lnd;
+			$data['emp_maternity_leave'] = $request->emp_maternity_leave;
+			$data['emp_paternity_leave'] = $request->emp_paternity_leave;
+			$data['emp_ccl'] = $request->emp_ccl;
+			$data['emp_el'] = $request->emp_el;
+			$data['emp_da'] = $request->emp_da;
+			$data['emp_vda'] = $request->emp_vda;
+			$data['emp_hra'] = $request->emp_hra;
+			$data['emp_prof_tax'] = $request->emp_prof_tax;
+			$data['emp_others_alw'] = $request->emp_others_alw;
+			$data['emp_tiff_alw'] = $request->emp_tiff_alw;
+			$data['emp_conv'] = $request->emp_conv;
+			$data['emp_medical'] = $request->emp_medical;
+			$data['emp_misc_alw'] = $request->emp_misc_alw;
+			$data['emp_over_time'] = $request->emp_over_time;
+			$data['emp_bouns'] = $request->emp_bouns;
+			$data['emp_pf'] = $request->emp_pf;
+			$data['emp_pf_int'] = $request->emp_pf_int;
+			$data['emp_co_op'] = $request->emp_co_op;
+			$data['emp_apf'] = $request->emp_apf;
+			$data['emp_i_tax'] = $request->emp_i_tax;
+			$data['emp_insu_prem'] = $request->emp_insu_prem;
+			$data['emp_pf_loan'] = $request->emp_pf_loan;
+			$data['emp_esi'] = $request->emp_esi;
+			$data['emp_adv'] = $request->emp_adv;
+			$data['emp_absent_deduction'] = $request->emp_absent_deduction;
+			$data['emp_gross_salary'] = $request->emp_gross_salary;
+			$data['emp_hrd'] = $request->emp_hrd;
+			$data['emp_gross_salary'] = $request->emp_gross_salary;
+			$data['emp_total_deduction'] = $request->emp_total_deduction;
+			$data['emp_net_salary'] = $request->emp_net_salary;
+			$data['emp_furniture'] = $request->emp_furniture;
+			$data['emp_misc_ded'] = $request->emp_misc_ded;
+			$data['emp_leave_inc'] = $request->emp_leave_inc;
+				$data['emp_hta'] = $request->emp_hta;
+					$data['emp_income_tax'] = $request->emp_income_tax;
+						$data['other_deduction'] = $request->other_deduction;
+							$data['other_addition'] = $request->other_addition;
+			$data['proces_status'] = 'process';
+			$data['created_at'] = date('Y-m-d');
+
+			$employee_pay_structure = Payroll_detail::where('employee_id', '=', $request->empname)
+				->where('month_yr', '=', $mnt_yr)
+				->first();
+
+			if (!empty($employee_pay_structure)) {
+				Session::flash('message', 'Payroll for this employee already generated for the month of "' . date('m-Y') . '". ');
+			} else {
+
+				Payroll_detail::insert($data);
+
+				$check_gpf = $this->checkGpfEligibility($data['employee_id']);
+
+				if ($check_gpf->pf == '1') {
+					//$this->npsMonthlyEnty($data);
+					$this->gpfMonthlyEnty($data);
+				}
+
+				Session::flash('message', 'Payroll Information Successfully Saved.');
+			}
+
+			return redirect('payroll/vw-payroll-generation');
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function SavePayrollAll(Request $request)
+	{
+
+		if (!empty(Session::get('admin'))) {
+
+			if (isset($request->empcode_check) && count($request->empcode_check) != 0) {
+				foreach ($request->empcode_check as $key => $value) {
+					$data['employee_id'] = $value;
+					$data['emp_name'] = $request['emp_name' . $value];
+					$data['emp_designation'] = $request['emp_designation' . $value];
+					$data['emp_basic_pay'] = $request['emp_basic_pay' . $value];
+					$data['month_yr'] = $request['month_yr' . $value];
+
+					$data['emp_present_days'] = $request['emp_no_of_present' . $value];
+					$data['emp_cl'] = $request['emp_tot_cl' . $value];
+					$data['emp_el'] = $request['emp_tot_el' . $value];
+					$data['emp_hpl'] = $request['emp_tot_hpl' . $value];
+					$data['emp_absent_days'] = $request['emp_no_of_days_absent' . $value];
+					$data['emp_rh'] = $request['emp_tot_rh' . $value];
+					$data['emp_cml'] = $request['emp_tot_cml' . $value];
+					$data['emp_eol'] = $request['emp_tot_eol' . $value];
+					$data['emp_lnd'] = $request['emp_lnd' . $value];
+					$data['emp_maternity_leave'] = $request['emp_tot_ml' . $value];
+					$data['emp_paternity_leave'] = $request['emp_tot_pl' . $value];
+					$data['emp_ccl'] = $request['emp_totccl' . $value];
+					$data['emp_da'] = $request['emp_da' . $value];
+					$data['emp_hra'] = $request['emp_hra' . $value];
+					$data['emp_transport_allowance'] = $request['emp_ta' . $value];
+					$data['emp_da_on_ta'] = $request['emp_daonta' . $value];
+					$data['emp_ltc'] = $request['emp_ltc' . $value];
+					$data['emp_cash_handle'] = $request['emp_cha' . $value];
+					$data['emp_travelling_allowance'] = $request['emp_tra' . $value];
+					$data['emp_spcl'] = $request['emp_spcl_allowance' . $value];
+					$data['emp_daily_allowance'] = $request['emp_dla' . $value];
+					$data['emp_advance'] = $request['emp_adv' . $value];
+					$data['emp_adjustment'] = $request['emp_adjadv' . $value];
+					$data['emp_medical'] = $request['emp_mr' . $value];
+					$data['emp_gpf'] = $request['emp_gpf' . $value];
+					$data['emp_nps'] = $request['emp_nps' . $value];
+					$data['emp_cpf'] = $request['emp_cpf' . $value];
+					$data['emp_gslt'] = $request['emp_gsli' . $value];
+					$data['emp_income_tax'] = $request['emp_income_tax' . $value];
+					$data['emp_cess'] = $request['emp_cess' . $value];
+					$data['emp_pro_tax'] = $request['emp_ptax' . $value];
+					$data['other_deduction'] = $request['emp_other2' . $value];
+					$data['emp_gross_salary'] = $request['emp_total_gross' . $value];
+					$data['emp_total_deduction'] = $request['emp_total_deduction' . $value];
+					$data['emp_net_salary'] = $request['emp_net_salary' . $value];
+					$data['proces_status'] = 'process';
+					$data['created_at'] = date('Y-m-d');
+
+					$employee_pay_structure = Payroll_detail::where('employee_id', '=', $value)
+						->where('month_yr', '=', $request['month_yr' . $value])
+						->first();
+
+					if (!empty($employee_pay_structure)) {
+						Session::flash('message', 'Already Entry in Table');
+					} else {
+
+						Payroll_detail::insert($data);
+						$check_gpf = $this->checkGpfEligibility($data['employee_id']);
+
+						if ($check_gpf->pf == '1') {
+					//$this->npsMonthlyEnty($data);
+					$this->gpfMonthlyEnty($data);
+				}
+						Session::flash('message', 'Payroll Information Successfully Saved.');
+					}
+				}
+			} else {
+				Session::flash('error', 'No Payroll Generation is selected');
+			}
+
+
+			return redirect('payroll/vw-payroll-generation-all-employee');
+		} else {
+			return redirect('/');
+		}
+	}
+
+	public function checkGpfEligibility($employee_id)
+	{
+
+		$check_gpf_status =	Employee_pay_structure::where('employee_code', '=', $employee_id)->first();
+
+		return $check_gpf_status;
+	}
+
+	public function npsMonthlyEnty($data)
+	{
+		//echo "<pre>"; print_r($data); exit;
+		$get_current_month_nps = Nps_details::where('emp_code', '=', $data['employee_id'])
+			->where('month_year', '=', $data['month_yr'])
+			->first();
+
+		if (empty($get_current_month_nps)) {
+
+			$get_last_month_nps = Nps_details::where('emp_code', '=', $data['employee_id'])
+				->orderBy('id', 'desc')
+				->first();
+
+			if (empty($get_last_month_nps)) {
+				$opening_balance = 0;
+			} else {
+				$opening_balance = $get_last_month_nps->closing_balance;
+			}
+
+			$closing_balance = $opening_balance + $data['emp_nps'] + $data['emp_nps'];
+
+			Nps_details::insert(
+				['emp_code' => $data['employee_id'], 'month_year' => $data['month_yr'], 'opening_balance' => $opening_balance, 'own_share' => $data['emp_nps'], 'company_share' => $data['emp_nps'], 'closing_balance' => $closing_balance, 'updated_at' => date("Y-m-d H:i:s"), 'created_at' => date("Y-m-d H:i:s")]
+			);
+		}
+	}
+
+	public function gpfMonthlyEnty($data)
+	{
+
+		$current_date = date('Y-m-d');
+		$get_current_month_gpf = Gpf_details::where('emp_code', '=', $data['employee_id'])
+			->where('month_year', '=', $data['month_yr'])
+			->first();
+
+		$current_month = '';
+		$current_year = '';
+		$previous_year = '';
+		$next_year = '';
+		$year = '';
+		$current_day = '';
+		$current_month1 = '';
+
+		$current_month = date('d', strtotime('02/' . $data['month_yr']));
+		$current_year = date('Y', strtotime('02/' . $data['month_yr']));
+		$previous_year =  $current_year - 1;
+		$next_year =  $current_year + 1;
+
+		if (date('m') <= '3') {
+			$year = $previous_year . '-' . $current_year;
+		} elseif (date('m') > '3') {
+			$year = $current_year . '-' . $next_year;
+		}
+
+		$current_day = $current_year;
+		$current_day .= '-' . $current_month;
+		$current_day .= '-01';
+
+
+		$current_month1 = date('Y-m-d', strtotime($current_day));
+		$rate_of_interest = Gpf_rate_master::where('from_date', '<=', $current_month1)
+			->where('to_date', '>=', $current_month1)
+			->first();
+
+
+		if (empty($get_current_month_gpf)) {
+
+			$get_last_month_gpf = Gpf_details::where('emp_code', $data['employee_id'])
+				->orderBy('id', 'desc')
+				->first();
+
+			if (empty($get_last_month_gpf)) {
+
+				$get_open_bal_gpf = Gpf_opening_balance::where('employee_id', $data['employee_id'])
+					->where('month_yr', '=', $year)
+
+					->orderBy('id', 'desc')
+					->first();
+
+				if (empty($get_open_bal_gpf)) {
+					$gpf_opening_balance = 0;
+				} else {
+					$gpf_opening_balance = $get_open_bal_gpf->opening_balance;
+				}
+			} else {
+				$gpf_opening_balance = $get_last_month_gpf->closing_balance;
+			}
+
+			if (!empty($rate_of_interest)) {
+
+				$date1 = date_create($rate_of_interest->from_date);
+				$date2 = date_create($rate_of_interest->to_date);
+				$diff = date_diff($date1, $date2);
+
+				round($diff->format("%R%a") / 30);
+
+
+				$rte_in = ($rate_of_interest->rate_of_interest) / 12;
+
+
+
+				$int = $gpf_opening_balance + $data['emp_pf'];
+
+				$interest_amt = (($int * $rte_in) / 100);
+			} else {
+				$rte_in = 0;
+				$interest_amt = 0;
+			}
+
+			if (!empty($get_last_month_gpf)) {
+				$get_close_bal_gpf = Gpf_loan_apply::where('employee_code', $data['employee_id'])
+					->where('updated_at', '>', $get_last_month_gpf->updated_at)
+					->Where('loan_status', '=', 'Paid')
+					->orderBy('id', 'desc')
+					->first();
+				if (!empty($get_close_bal_gpf)) {
+					$close = $get_close_bal_gpf->loan_amount;
+				} else {
+					$close = 0;
+				}
+			} else {
+				$close = 0;
+			}
+
+
+
+			$gpf_closing_balance = $gpf_opening_balance + $data['emp_pf'] - $close;
+
+			Gpf_details::insert(['emp_code' => $data['employee_id'], 'month_year' => $data['month_yr'], 'opening_balance' => $gpf_opening_balance, 'own_share' => $data['emp_pf'], 'company_share' => $data['emp_pf'], 'rate_of_interest' => $rte_in, 'interest_amount' => $interest_amt, 'closing_balance' => $gpf_closing_balance, 'updated_at' => date("Y-m-d H:i:s"), 'created_at' => date("Y-m-d H:i:s"), 'loan_amount' => $close]);
+		}
+	}
+	
+	   public function deletePayrolldeatisl($paystructure_id)
+    {
+        if (!empty(Session::get('admin'))) {
+$emp_dtl=Payroll_detail::where('id', $paystructure_id)->first();
+		$this->deleteNps($emp_dtl->month_yr,$emp_dtl->employee_id);
+		$this->deleteGpf($emp_dtl->month_yr,$emp_dtl->employee_id);
+            $result = Payroll_detail::where('id', $paystructure_id)->delete();
+            Session::flash('message', 'Deleted Successfully.');
+            return redirect('payroll/vw-payroll-generation');
+        } else {
+            return redirect('/');
+        }
+    }
+	
+	  public function deletePayrollAll($paystructure_id)
+    {
+        if (!empty(Session::get('admin'))) {
+$emp_dtl=Payroll_detail::where('id', $paystructure_id)->first();
+		$this->deleteNps($emp_dtl->month_yr,$emp_dtl->employee_id);
+		$this->deleteGpf($emp_dtl->month_yr,$emp_dtl->employee_id);
+            $result = Payroll_detail::where('id', $paystructure_id)->delete();
+            Session::flash('message', 'Deleted Successfully.');
+            return redirect('payroll/vw-payroll-generation-all-employee');
+        } else {
+            return redirect('/');
+        }
+    }
+	
+	public function deletePayroll($paystructure_id)
+	{
+		  if (!empty(Session::get('admin'))) {
+		$emp_dtl=Payroll_detail::where('id', $paystructure_id)->first();
+		$this->deleteNps($emp_dtl->month_yr,$emp_dtl->employee_id);
+		$this->deleteGpf($emp_dtl->month_yr,$emp_dtl->employee_id);
+            $result = Payroll_detail::where('id', $paystructure_id)->delete();
+		Session::flash('message','Pay Detail Deleted Successfully.');
+		return redirect('payroll/vw-process-payroll');
+		 } else {
+            return redirect('/');
+        }
+	}
+	
+		public function deleteNps($month,$emp_code)
+	{
+		$result= Nps_details::where('month_year', $month)
+		->where('emp_code', $emp_code)
+		->delete();
+
+	}
+
+	public function deleteGpf($month,$emp_code)
+	{
+		$result= Gpf_details::where('month_year', $month)
+		->where('emp_code', $emp_code)
+		->delete();
+
+	}
+}
