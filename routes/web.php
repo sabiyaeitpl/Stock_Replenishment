@@ -19,6 +19,15 @@ use Route;
 |
  */
 
+ //import controller route
+ Route::get('stock/dashboard', 'import\ImportController@viewdashboard');
+ Route::get('stock', 'import\ImportController@getStock');
+ Route::get('add-stock', 'import\ImportController@viewAddStock');
+ Route::post('add-stock', 'import\ImportController@importExcel');
+ 
+
+ //end import controller route
+
 //******* Routes with Login  start *********//
 Route::get('/', 'HomeController@getlogin');
 Route::post('/login', 'HomeController@DoLogin');

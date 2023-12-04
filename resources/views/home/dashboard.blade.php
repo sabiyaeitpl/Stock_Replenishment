@@ -8,7 +8,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-6 col-6">
-                        <img src="{{ asset('theme/images/bellevue-logo1.png') }}" style="width:200px;">
+                        <!-- <img src="{{ asset('theme/images/bellevue-logo1.png') }}" style="width:200px;"> -->
                     </div>
 
                     <div class="col-lg-8 col-md-8 col-sm-6 col-6">
@@ -92,7 +92,7 @@ if ($roles->module_name == 'DAK Management') {
                                 </div>
                             </a>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <!-- <div class="col-lg-4 col-md-6 col-sm-6 col-12">
 
 
                         <a href="{{ url('finance-dashboard') }}">
@@ -108,12 +108,12 @@ if ($roles->module_name == 'DAK Management') {
                                 </div>
                             </div>
                         </a>
-                    </div>
+                    </div> -->
 
 
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">
                         @if($hcm=='Human_Capital')
-                        <a href="{{ url('hcm-dashboard') }}">
+                        <a href="{{ url('stock/dashboard') }}">
                             @else
                             <a href="#">
                                 @endif
@@ -122,7 +122,7 @@ if ($roles->module_name == 'DAK Management') {
                                         <img src="{{ asset('theme/main/hcm.png') }}" alt="">
                                     </div>
                                     <div class="dash-name">
-                                        <h3>Human Capital</h3>
+                                        <h3>Stock Replanishment</h3>
                                     </div>
                                 </div>
                             </a>
@@ -175,7 +175,7 @@ if ($roles->module_name == 'DAK Management') {
                             </div>
                         </a>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <!-- <div class="col-lg-4 col-md-6 col-sm-6 col-12">
                         <a href="{{ url('finance-dashboard') }}">
                             <div class="box sky">
                                 <div class="dash-icon">
@@ -186,17 +186,17 @@ if ($roles->module_name == 'DAK Management') {
                                 </div>
                             </div>
                         </a>
-                    </div>
+                    </div> -->
 
 
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <a href="{{ url('hcm-dashboard') }}">
+                        <a href="{{ url('stock/dashboard') }}">
                             <div class="box dc">
                                 <div class="dash-icon">
                                     <img src="{{ asset('theme/main/hcm.png') }}" alt="">
                                 </div>
                                 <div class="dash-name">
-                                    <h3>Human Capital</h3>
+                                    <h3>Stock Replanishment</h3>
                                 </div>
                             </div>
                         </a>

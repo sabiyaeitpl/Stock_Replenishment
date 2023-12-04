@@ -55,14 +55,14 @@ function my_simple_crypt($string, $action = 'encrypt')
     <div class="animated fadeIn">
         <div class="row" style="border:none;">
             <div class="col-md-6">
-                <h5 class="card-title">Employee Master</h5>
+                <h5 class="card-title">Stock Master</h5>
             </div>
             <div class="col-md-6">
                 <span class="right-brd" style="padding-right:15x;">
                     <ul class="">
-                        <li><a href="#">Employee</a></li>
+                        <li><a href="#">Stock</a></li>
                         <li>/</li>
-                        <li class="active">Employee Master</li>
+                        <li class="active">Stock Master</li>
 
                     </ul>
                 </span>
@@ -76,7 +76,7 @@ function my_simple_crypt($string, $action = 'encrypt')
 
                     <div class="card-header">
                     <div class="aply-lv">
-                        <a href="{{ url('add-employee') }}" class="btn btn-default" style="float:right;">Add Employee Master <i class="fa fa-plus"></i></a>
+                        <a href="{{ url('add-stock') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
                         @if(count($employee_rs)>0)
                         <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -86,7 +86,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                                 <form  method="post" action="{{ url('xls-export-employee-only') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Employee Only</button>
+											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Stock Data Only</button>
 												</form>
                         @endif
                     </div>
@@ -106,27 +106,24 @@ function my_simple_crypt($string, $action = 'encrypt')
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
-                                    <th>Employee ID</th>
-                                    <th>Employee Code</th>
-                                    <th>Employee Name</th>
-                                    <th>Designation</th>
-                                    <th>Mobile</th>
-                                    <th>Action</th>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Section</th>
+                                    <th>Department</th>
+                                    <th>Barcode</th>
+                                   
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($employee_rs as $employee)
                                 <tr>
                                     <td>{{ $loop->iteration}}</td>
-                                    <td>{{ $employee->emp_code}}</td>
-                                    <td>{{ $employee->old_emp_code}}</td>
-                                    <td>{{ $employee->salutation."".$employee->emp_fname." ".$employee->emp_mname." ".$employee->emp_lname }}</td>
-                                    <td>{{ $employee->emp_designation }}</td>
-                                    <td>{{ $employee->emp_ps_mobile }}</td>
-                                    <td>
-                                    <a href="{{ url('edit-employee') }}?q={{ my_simple_crypt( $employee->emp_code, 'encrypt' )}}"><i class="ti-pencil-alt"></i></a>
-
-                                    </td>
+                                    <td>{{ $employee->name}}</td>
+                                    <td>{{ $employee->date}}</td>
+                                    <td>{{ $employee->section}}</td>
+                                    <td>{{ $employee->department }}</td>
+                                    <td>{{ $employee->barcode }}</td>
+                                   
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -212,7 +212,7 @@
                                 	</div>
 									<div class="col-md-8 col-8 pl0">
 										<div class="hcm-name">
-											<p>Employee</p>
+											<p></p>
 											<a href="{{ url('employee/dashboard') }}"><img class="" src="{{ asset('theme/images/arrow.png') }}" alt=""></a>
 										</div>
 									</div>
