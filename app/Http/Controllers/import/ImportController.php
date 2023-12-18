@@ -91,7 +91,7 @@ class ImportController extends Controller
     }
     public function viewAddStock()
     {
-        
+
         if (!empty(Session::get('admin'))) {
 
             $email = Session::get('adminusernmae');
@@ -101,14 +101,14 @@ class ImportController extends Controller
                 ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
                 ->where('member_id', '=', $email)
                 ->get();
-            
+
             return view('stock/stock-master',$data);
         } else {
             return redirect('/');
         }
     }
 
-   
+
 
     public function importExcel(Request $request){
         if (!empty(Session::get('admin'))) {
@@ -128,7 +128,7 @@ class ImportController extends Controller
                 //     ['upload_csv.required' => 'File Must Be required!',
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
-               
+
                 $rasponse=DB::table('stock')->delete();
                 if($rasponse){
                     $path = $request->file('upload_csv');
@@ -139,7 +139,7 @@ class ImportController extends Controller
                     Session::flash('message', 'Tecnical issue Excel Information Not Upload.');
                     return redirect('stock');
                 }
-                
+
             }else {
                 return redirect('/');
             }
@@ -184,7 +184,7 @@ class ImportController extends Controller
                 ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
                 ->where('member_id', '=', $email)
                 ->get();
-            
+
             return view('stock/sales-master',$data);
         } else {
             return redirect('/');
@@ -209,7 +209,7 @@ class ImportController extends Controller
                 //     ['upload_csv.required' => 'File Must Be required!',
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
-               
+
                 $path = $request->file('upload_csv');
                 Excel::import(new importSales,$path);
                 Session::flash('message', 'Excel Information Successfully saved.');
@@ -231,7 +231,7 @@ class ImportController extends Controller
                 ->get();
 
             $data['sales_rs'] = rolsModel::get();
-            
+
             return view('stock/view-rol',$data);
         } else {
             return redirect('/');
@@ -248,7 +248,7 @@ class ImportController extends Controller
                 ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
                 ->where('member_id', '=', $email)
                 ->get();
-            
+
             return view('stock/rol-master',$data);
         } else {
             return redirect('/');
@@ -273,7 +273,7 @@ class ImportController extends Controller
                 //     ['upload_csv.required' => 'File Must Be required!',
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
-               
+
                 $path = $request->file('upload_csv');
                 Excel::import(new importRol,$path);
                 Session::flash('message', 'Excel Information Successfully saved.');
@@ -282,7 +282,7 @@ class ImportController extends Controller
                 return redirect('/');
             }
     }
-   
+
 
     public function salesCompare(){
         if (!empty(Session::get('admin'))) {

@@ -1,5 +1,5 @@
 <head>
-<link rel="icon" href="{{ asset('img/logo-small.png') }}" type="image/x-icon"/>
+{{-- <link rel="icon" href="{{ asset('img/logo-small.png') }}" type="image/x-icon"/> --}}
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
           * {

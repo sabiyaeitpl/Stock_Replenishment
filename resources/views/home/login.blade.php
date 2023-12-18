@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a81368914c.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{{ asset('img/logo-small.png') }}" type="image/x-icon"/>
+    {{-- <link rel="icon" href="{{ asset('img/logo-small.png') }}" type="image/x-icon"/> --}}
 </head>
 
 <body style="background-color:white;">
