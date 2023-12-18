@@ -179,7 +179,7 @@ li{list-style-type: none;}
     color: #13548d;
     font-weight: 600;}
 		  .login-bg {
-    background: url({{ asset('images/login-bg.jpg') }}) no-repeat center center;
+    background: url({{ asset('images/stock.jpg') }}) no-repeat center center;
     background-size: 100%;
     height: 100vh;
 }
@@ -248,7 +248,7 @@ footer p{color:#fff;margin-bottom:0;}
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Bellevue - LOGIN</title>
+    <title>Stock - LOGIN</title>
     <meta name="description" content="Ela Admin - HTML5 Admin Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-------------favicon--------------->

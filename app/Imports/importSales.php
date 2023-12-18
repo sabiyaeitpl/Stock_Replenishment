@@ -2,10 +2,10 @@
 
 namespace App\Imports;
 
-use App\Models\importUserModel;
+use App\Models\salesModel;
 use Maatwebsite\Excel\Concerns\ToModel;
 
-class importUser implements ToModel
+class importSales implements ToModel
 {
     /**
     * @param array $row
@@ -14,8 +14,7 @@ class importUser implements ToModel
     */
     public function model(array $row)
     {
-
-        return new importUserModel([
+        return new salesModel([
             'storeId'=>$row[0],
             'date'=>$row[1],
             'sku'=>$row[2],

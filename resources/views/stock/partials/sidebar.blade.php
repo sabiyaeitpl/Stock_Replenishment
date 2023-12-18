@@ -87,14 +87,15 @@ $menuslist = array_unique($menus);?>
                         <ul class="sub-menu children dropdown-menu">
 
                             <li><a href="{{ url('stock') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Stock List</a></li>
+                            <li><a href="{{ url('sales') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Sales List</a></li>
+                            <li><a href="{{ url('rol') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Rol List</a></li>
+                            <li><a href="{{ url('compare') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Product Compare</a></li>
                         </ul>
                     </li>
 
                     
 
-            <!-- <li><a href="{{ url('employee-corner/vw-classwise-employee') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" />Employee[Class Wise]</a></li> -->
-
-
+        
                 </ul>
             </div>
         </nav>

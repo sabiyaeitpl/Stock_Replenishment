@@ -1,19 +1,19 @@
-@extends('employee.layouts.master')
+@extends('stock.layouts.master')
 
 @section('title')
-Employee Information System-Employees
+Stock Information
 @endsection
 
 @section('sidebar')
-@include('employee.partials.sidebar')
+@include('stock.partials.sidebar')
 @endsection
 
 @section('header')
-@include('employee.partials.header')
+@include('stock.partials.header')
 @endsection
 
 @section('scripts')
-@include('employee.partials.scripts')
+@include('stock.partials.scripts')
 @endsection
 
 @section('content')
@@ -29,7 +29,7 @@ Employee Information System-Employees
 
                            <span class="right-brd" style="padding-right:15x;">
                             <ul class="">
-							<li><a href="#">Stock Management</a></li>
+							<li><a href="#">Sales Management</a></li>
                                 <li>/</li>
                                 <!-- <li><a href="#">Employee Master</a></li>
                                 <li>/</li> -->

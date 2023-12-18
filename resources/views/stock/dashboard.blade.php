@@ -1,21 +1,21 @@
-@extends('employee.layouts.master')
+@extends('stock.layouts.master')
 
 @section('title')
-Employee Dashboard
+stock Dashboard
 @endsection
 
 @section('sidebar')
-	@include('employee.partials.sidebar')
+	@include('stock.partials.sidebar')
 @endsection
 
 @section('header')
-	@include('employee.partials.header')
+	@include('stock.partials.header')
 @endsection
 
 
 
 @section('scripts')
-	@include('employee.partials.scripts')
+	@include('stock.partials.scripts')
 @endsection
 
 @section('content')

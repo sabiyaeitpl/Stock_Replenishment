@@ -22,8 +22,15 @@ use Route;
  //import controller route
  Route::get('stock/dashboard', 'import\ImportController@viewdashboard');
  Route::get('stock', 'import\ImportController@getStock');
+ Route::get('sales', 'import\ImportController@getSales');
+ Route::get('rol', 'import\ImportController@getRol');
+ Route::get('add-sales', 'import\ImportController@viewAddSales');
+ Route::post('add-sales', 'import\ImportController@importSaalesExcel');
  Route::get('add-stock', 'import\ImportController@viewAddStock');
  Route::post('add-stock', 'import\ImportController@importExcel');
+ Route::get('add-rol','import\ImportController@viewRol');
+ Route::post('add-rol', 'import\ImportController@importRolExcel');
+ Route::get('compare','import\ImportController@salesCompare');
  
 
  //end import controller route

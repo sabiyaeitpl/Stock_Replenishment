@@ -1,19 +1,19 @@
-@extends('employee.layouts.master')
+@extends('stock.layouts.master')
 
 @section('title')
-Employee Information System-Employees
+Stock Information 
 @endsection
 
 @section('sidebar')
-@include('employee.partials.sidebar')
+@include('stock.partials.sidebar')
 @endsection
 
 @section('header')
-@include('employee.partials.header')
+@include('stock.partials.header')
 @endsection
 
 @section('scripts')
-@include('employee.partials.scripts')
+@include('stock.partials.scripts')
 @endsection
 
 @section('content')
@@ -55,14 +55,14 @@ function my_simple_crypt($string, $action = 'encrypt')
     <div class="animated fadeIn">
         <div class="row" style="border:none;">
             <div class="col-md-6">
-                <h5 class="card-title">Stock Master</h5>
+                <h5 class="card-title">Sales Master</h5>
             </div>
             <div class="col-md-6">
                 <span class="right-brd" style="padding-right:15x;">
                     <ul class="">
-                        <li><a href="#">Stock</a></li>
+                        <li><a href="#">Sales</a></li>
                         <li>/</li>
-                        <li class="active">Stock Master</li>
+                        <li class="active">Sales Master</li>
 
                     </ul>
                 </span>
@@ -76,8 +76,8 @@ function my_simple_crypt($string, $action = 'encrypt')
 
                     <div class="card-header">
                     <div class="aply-lv">
-                        <a href="{{ url('add-stock') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
-                        @if(count($employee_rs)>0)
+                        <a href="{{ url('add-sales') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
+                        @if(count($sales_rs)>0)
                         <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
@@ -86,7 +86,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                                 <form  method="post" action="{{ url('xls-export-employee-only') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Stock Data Only</button>
+											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Sales Data Only</button>
 												</form>
                         @endif
                     </div>
@@ -106,23 +106,20 @@ function my_simple_crypt($string, $action = 'encrypt')
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
-                                    <th>Name</th>
+                                    <th>Sku</th>
                                     <th>Date</th>
-                                    <th>Section</th>
-                                    <th>Department</th>
-                                    <th>Barcode</th>
+                                    <th>Total Quantity</th>
                                    
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($employee_rs as $employee)
+                             
+                                @foreach($sales_rs as $item)
                                 <tr>
                                     <td>{{ $loop->iteration}}</td>
-                                    <td>{{ $employee->name}}</td>
-                                    <td>{{ $employee->date}}</td>
-                                    <td>{{ $employee->section}}</td>
-                                    <td>{{ $employee->department }}</td>
-                                    <td>{{ $employee->barcode }}</td>
+                                    <td>{{ $item->barcode }}</td>
+                                    <td>{{ $item->date }}</td>
+                                    <td>{{ $item->total_quantity }}</td>
                                    
                                 </tr>
                                 @endforeach

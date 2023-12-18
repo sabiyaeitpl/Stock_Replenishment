@@ -3,7 +3,7 @@
 @include('layouts.default-login')
 
 <head>
-    <title>Bellevue Payroll - Admin Login</title>
+    <title>Stock - Admin Login</title>
     <!-- <link rel="stylesheet" type="text/css" href="css/style.css"> -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a81368914c.js"></script>
@@ -17,9 +17,9 @@
         <div class="container login">
             <div class="row main" id="bg-white" style="">
                 <div class="col-lg-6 logo">
-                    <img src="{{ asset('theme/images/bellevue-logo1.png') }}">
+                    <img src="{{ asset('theme/images/download.jfif') }}">
                     <div class="row">
-                        <h1> <span id="green">Belle Vue </span> <span id="blue">HRMS</span></h1>
+                        <h1> <span id="green">Stock</span> <span id="blue">Replenishment </span></h1>
                     </div>
                 </div>
 
