@@ -9,6 +9,7 @@ use App\Models\Masters\Role_authorization;
 use App\Models\Role\Employee;
 use App\Models\Attendance\Upload_attendence;
 use App\Models\Attendance\Process_attendance;
+use Maatwebsite\Excel\Facades\Excel;
 use View;
 use Validator;
 use Session;
@@ -22,10 +23,11 @@ use Illuminate\Support\Arr;
 use App\Imports\importUser;
 use App\Imports\importSales;
 use App\Imports\importRol;
-use Excel;
+// use Excel;
 use App\Models\importUserModel;
 use App\Models\salesModel;
 use App\Models\rolsModel;
+
 use DB;
 class ImportController extends Controller
 {
@@ -129,16 +131,18 @@ class ImportController extends Controller
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
 
-                $rasponse=DB::table('stock')->delete();
-                if($rasponse){
+                // $rasponse=DB::table('stock')->delete();
+                // if($rasponse){
                     $path = $request->file('upload_csv');
                     Excel::import(new importUser,$path);
+
+                    // Excel::filter('chunk')->import(new importUser, $path);
                     Session::flash('message', 'Excel Information Successfully saved.');
                     return redirect('stock');
-                }else{
-                    Session::flash('message', 'Tecnical issue Excel Information Not Upload.');
-                    return redirect('stock');
-                }
+                // }else{
+                //     Session::flash('message', 'Tecnical issue Excel Information Not Upload.');
+                //     return redirect('stock');
+                // }
 
             }else {
                 return redirect('/');
