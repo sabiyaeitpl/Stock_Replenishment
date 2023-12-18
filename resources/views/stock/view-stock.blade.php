@@ -106,11 +106,12 @@ function my_simple_crypt($string, $action = 'encrypt')
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
-                                    <th>Sku</th>
-                                    <th>Date</th>
-                                    <th>Style Code</th>
-                                    <th>Brand</th>
-                                    <th>MRP</th>
+                                    <th>Name</th>
+                                    <th>Division</th>
+                                    <th>Section</th>
+                                    <th>Department</th>
+                                    <th>Barcode</th>
+                                    <th>Quantity</th>
                                    
                                 </tr>
                             </thead>
@@ -118,11 +119,12 @@ function my_simple_crypt($string, $action = 'encrypt')
                                 @foreach($employee_rs as $employee)
                                 <tr>
                                     <td>{{ $loop->iteration}}</td>
-                                    <td>{{ $employee->sku}}</td>
-                                    <td>{{ $employee->date}}</td>
-                                    <td>{{ $employee->styleCode}}</td>
-                                    <td>{{ $employee->brand }}</td>
-                                    <td>{{ $employee->mrp }}</td>
+                                    <td>{{ $employee->name}}</td>
+                                    <td>{{ $employee->division}}</td>
+                                    <td>{{ $employee->section}}</td>
+                                    <td>{{ $employee->department }}</td>
+                                    <td>{{ $employee->barcode }}</td>
+                                    <td>{{ $employee->stock_quantity }}</td>
                                    
                                 </tr>
                                 @endforeach
