@@ -129,10 +129,17 @@ class ImportController extends Controller
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
                
-                $path = $request->file('upload_csv');
-                Excel::import(new importUser,$path);
-                Session::flash('message', 'Excel Information Successfully saved.');
-                return redirect('stock');
+                $rasponse=DB::table('stock')->delete();
+                if($rasponse){
+                    $path = $request->file('upload_csv');
+                    Excel::import(new importUser,$path);
+                    Session::flash('message', 'Excel Information Successfully saved.');
+                    return redirect('stock');
+                }else{
+                    Session::flash('message', 'Tecnical issue Excel Information Not Upload.');
+                    return redirect('stock');
+                }
+                
             }else {
                 return redirect('/');
             }
@@ -206,7 +213,7 @@ class ImportController extends Controller
                 $path = $request->file('upload_csv');
                 Excel::import(new importSales,$path);
                 Session::flash('message', 'Excel Information Successfully saved.');
-                return redirect('stock');
+                return redirect('sales');
             }else {
                 return redirect('/');
             }
@@ -270,7 +277,7 @@ class ImportController extends Controller
                 $path = $request->file('upload_csv');
                 Excel::import(new importRol,$path);
                 Session::flash('message', 'Excel Information Successfully saved.');
-                return redirect('stock');
+                return redirect('rol');
             }else {
                 return redirect('/');
             }

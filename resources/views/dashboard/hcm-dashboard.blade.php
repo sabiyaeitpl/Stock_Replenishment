@@ -181,7 +181,7 @@
 						</div> -->
 						@endif
 
-						@if (in_array("Attendance", $submenuslist))
+						<!-- @if (in_array("Attendance", $submenuslist))
 						<div class="col-md-4">
 							<div class="hcm">
 								<div class="row">
@@ -199,10 +199,10 @@
 	                           </div>
 							</div>
 						</div>
-						@endif
+						@endif -->
 					 <!-- </div> -->
 					@else
-						<div class="col-md-4">
+						<!-- <div class="col-md-4">
 							<div class="hcm">
 								<div class="row">
 									<div class="col-md-4 col-4 pr0">
@@ -218,7 +218,7 @@
 									</div>
                            		</div>
 							</div>
-						</div>
+						</div> -->
 						<!-- <div class="col-md-4">
 							<div class="hcm">
 								<div class="row">
@@ -272,7 +272,7 @@
 
 						<!-- </div> -->
 
-						<div class="col-md-4">
+						<!-- <div class="col-md-4">
 							<div class="hcm">
 								<div class="row">
 									<div class="col-md-4 col-4 pr0">
@@ -288,7 +288,7 @@
 									</div>
 	                           </div>
 							</div>
-						</div>
+						</div> -->
 					 <!-- </div> -->
 					@endif
 					</div>

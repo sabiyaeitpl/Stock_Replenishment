@@ -143,7 +143,7 @@ if ($roles->module_name == 'DAK Management') {
                     </div> -->
 
 
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <!-- <div class="col-lg-4 col-md-6 col-sm-6 col-12">
                         @if($hcm=='Human_Capital')
                         <a href="{{ url('masters/dashboard') }}">
                             @else
@@ -159,7 +159,7 @@ if ($roles->module_name == 'DAK Management') {
                                     </div>
                                 </div>
                             </a>
-                    </div>
+                    </div> -->
 
                     @elseif($admin->user_type=='admin')
 
@@ -217,7 +217,7 @@ if ($roles->module_name == 'DAK Management') {
                     </div> -->
 
 
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <!-- <div class="col-lg-4 col-md-6 col-sm-6 col-12">
                         <a href="{{ url('masters/dashboard') }}">
                             <div class="box blue">
                                 <div class="dash-icon">
@@ -228,7 +228,7 @@ if ($roles->module_name == 'DAK Management') {
                                 </div>
                             </div>
                         </a>
-                    </div>
+                    </div> -->
 
                     @endif
                     @endif
