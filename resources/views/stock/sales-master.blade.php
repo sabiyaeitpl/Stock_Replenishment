@@ -96,6 +96,6 @@ Stock Information
          @endsection
 
 @section('scripts')
-@include('attendance.partials.scripts')
+@include('stock.partials.scripts')
 
 @endsection

@@ -76,17 +76,20 @@ function my_simple_crypt($string, $action = 'encrypt')
 
                     <div class="card-header">
                     <div class="aply-lv">
-                        <a href="{{ url('add-stock') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
+                    <button type="button" class="btn btn-primary mx-1" title="Import Pay Details" style="float:right" data-toggle="modal" data-target="#exampleModal1">
+                            Import Stock Details
+                     </button>
+                        <!-- <a href="{{ url('add-stock') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a> -->
                         @if(count($employee_rs)>0)
                         <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button>
+											<!-- <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button> -->
 												</form>
                                 <form  method="post" action="{{ url('xls-export-employee-only') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Stock Data Only</button>
+											<!-- <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Stock Data Only</button> -->
 												</form>
                         @endif
                     </div>
@@ -101,6 +104,8 @@ function my_simple_crypt($string, $action = 'encrypt')
                         <a href="{{ url('add-employee') }}" class="btn btn-default">Add Employee Master <i class="fa fa-plus"></i></a>
                     </div> -->
                     <br />
+                    
+
                     <div class="clear-fix">
                         <table id="bootstrap-data-table" class="table table-striped table-bordered">
                             <thead>
@@ -112,7 +117,6 @@ function my_simple_crypt($string, $action = 'encrypt')
                                     <th>Department</th>
                                     <th>Barcode</th>
                                     <th>Quantity</th>
-                                   
                                 </tr>
                             </thead>
                             <tbody>
@@ -142,6 +146,37 @@ function my_simple_crypt($string, $action = 'encrypt')
 
         </div>
         <!-- /Widgets -->
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+						  <form style='padding: 0px;' action="#" method="post" enctype="multipart/form-data">
+							  @csrf
+							  <div class="modal-content">
+								<!--<div class="modal-header">-->
+								<!--  <h5 class="modal-title" id="exampleModalLabel">Import Excel</h5>-->
+								<!--  <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+								<!--    <span aria-hidden="true">&times;</span>-->
+								<!--  </button>-->
+								<!--</div>-->
+								<div class="modal-body">
+								  
+									<div class="form-group">
+									  <label for="excel_file">Upload Stock Details CSV</label>
+									  <input type="file" name="excel_file" class="form-control" style='height: 40px;' id="excel_file">
+									</div>
+								  
+								</div>
+								<div class="modal-footer">
+								  <button type="button" class="btn btn-secondary" style="padding: 0px 8px;height: 32px;" data-dismiss="modal">Close</button>
+								  <button type="submit" class="btn btn-primary" style="color: #fff;background-color: #0884af;border-color: #0884af;padding: 0px 8px;height: 32px;">Import</button>
+								</div>
+							  </div>
+						  </form>
+						</div>
+					  </div>
+					  <!-- END -->
 
 
 
