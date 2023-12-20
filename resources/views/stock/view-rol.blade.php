@@ -67,10 +67,8 @@ Stock Information
                         <tr>
                            <th>Sl No.</th>
                            <th>Sku</th>
-                           <th>Effective To</th>
-                           <th>Effective From  </th>
-                           <th>styleCode</th>
-                           <th>Brand </th>
+                           <th>Effective From</th>
+                           <th>Effective To  </th>
                            <th>Quantity </th>
                         </tr>
                      </thead>
@@ -79,10 +77,8 @@ Stock Information
                         <tr>
                            <td>{{ $loop->iteration}}</td>
                            <td>{{ $item->sku}}</td>
-                           <td>{{ $item->effective_to }}</td>
                            <td>{{ $item->effective_from }}</td>
-                           <td>{{ $item->styleCode}}</td>
-                           <td>{{ $item->brand }}</td>
+                           <td>{{ $item->effective_to }}</td>
                            <td>{{ $item->quantity }}</td>
                         </tr>
                         @endforeach

@@ -33,6 +33,9 @@ use Route;
  //Rol Route
  Route::get('stock/rol', 'Stock\RolController@getRol');
  Route::get('stock/add-rol','Stock\RolController@addRol');
+ Route::post('stock/add-rol','Stock\RolController@saveRol');
+ Route::post('/get-sku-codes', 'Stock\RolController@getSkuCodes');
+ Route::post('/get-data', 'Stock\RolController@getData');
 
 
  //end import controller route

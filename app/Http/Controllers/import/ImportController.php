@@ -316,9 +316,9 @@ class ImportController extends Controller
         $quantity = (int)$item->rol_quantity;
         $response = DB::table('stock')
             ->select('stock.*', 'rol.quantity as rol_quantity')
-            ->join('rol', 'stock.sku', '=', 'rol.sku')
-            ->where('stock.sku', $item->sku)
-            ->where('stock.quantity','<',$quantity)
+            ->join('rol', 'stock.barcode', '=', 'rol.sku')
+            ->where('stock.barcode', $item->sku)
+            ->where('stock.stock_quantity','<',$quantity)
             ->get();
         if ($response->isNotEmpty()) {
             $data['rolValue'][] = $response;
