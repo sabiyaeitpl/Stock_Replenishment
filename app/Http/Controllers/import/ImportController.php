@@ -10,6 +10,7 @@ use App\Models\Role\Employee;
 use App\Models\Attendance\Upload_attendence;
 use App\Models\Attendance\Process_attendance;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 use View;
 use Validator;
 use Session;
@@ -135,6 +136,9 @@ class ImportController extends Controller
                 // if($rasponse){
                     $path = $request->file('upload_csv');
                     Excel::import(new importUser,$path);
+
+                    $delayInSeconds = 30;
+                    sleep($delayInSeconds);
 
                     // Excel::filter('chunk')->import(new importUser, $path);
                     Session::flash('message', 'Excel Information Successfully saved.');
