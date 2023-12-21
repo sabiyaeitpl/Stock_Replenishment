@@ -296,15 +296,15 @@ class ImportController extends Controller
             ->get();
 
         $results = DB::table('sales')
-        ->select('sales.sku', DB::raw('SUM(sales.quantity) as total_sales_quantity'), 'rol.quantity as rol_quantity', 'sales.date')
+        ->select('sales.barcode', DB::raw('SUM(sales.bill_quantity) as total_sales_quantity'), 'rol.quantity as rol_quantity', 'sales.date')
         ->join('rol', function ($join) {
-            $join->on('sales.sku', '=', 'rol.sku')
+            $join->on('sales.barcode', '=', 'rol.sku')
                 ->where(function ($query) {
                     $query->where('sales.date', '<=', DB::raw('rol.effective_from'))
                         ->orWhere('sales.date', '>=', DB::raw('rol.effective_to'));
                 });
         })
-        ->groupBy('sales.sku')
+        ->groupBy('sales.barcode')
         ->orderByDesc('total_sales_quantity')
         ->get();
         $data['rolValue'] = [];
