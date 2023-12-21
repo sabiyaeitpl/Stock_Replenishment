@@ -19,13 +19,10 @@ class salesModel extends Model
      *
      * @var array
      */
-    // protected $fillable = [
-    //     'name', 'date', 'section','department','category_1','category_2','category_3','category_4','category_5','category_6','barcode','bill_quantity','mrp_amount','net_amount','tax_desc','tax_amt','dis_amt','mobile_no','status'
-    // ];
     protected $fillable = [
-        'storeId', 'date', 'sku','styleCode','artical','size','size1','shadeCode','brand','mrp','quantity'
+        'storeId','name', 'date', 'section','department','category_1','category_2','category_3','category_4','category_5','category_6','barcode','bill_quantity','mrp_amount','net_amount','tax_desc','tax_amt','dis_amt','mobile_no'
     ];
-
+   
     // use HasFactory;
     protected $table= "sales";
 

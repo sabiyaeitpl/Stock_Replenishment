@@ -76,7 +76,10 @@ function my_simple_crypt($string, $action = 'encrypt')
 
                     <div class="card-header">
                     <div class="aply-lv">
-                        <a href="{{ url('add-sales') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
+                    <button type="button" class="btn btn-primary mx-1" title="Import Pay Details" style="float:right" data-toggle="modal" data-target="#exampleModal1">
+                            Import Sales Details
+                     </button>
+                        <!-- <a href="{{ url('add-sales') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a> -->
                         @if(count($sales_rs)>0)
                         <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -137,6 +140,31 @@ function my_simple_crypt($string, $action = 'encrypt')
 
         </div>
         <!-- /Widgets -->
+
+         <!-- Modal -->
+         <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+						  <form style='padding: 0px;' action="{{url('add-sales')}}" method="post" enctype="multipart/form-data">
+							  @csrf
+							  <div class="modal-content">
+								<div class="modal-body">
+								  
+									<div class="form-group">
+									  <label for="excel_file">Upload Sales Details CSV</label>
+                                      <input type="file" id="upload_csv" name="upload_csv" required class="form-control-file">
+
+									</div>
+								  
+								</div>
+								<div class="modal-footer">
+								  <button type="button" class="btn btn-secondary" style="padding: 0px 8px;height: 32px;" data-dismiss="modal">Close</button>
+								  <button type="submit" class="btn btn-primary" style="color: #fff;background-color: #0884af;border-color: #0884af;padding: 0px 8px;height: 32px;">Import</button>
+								</div>
+							  </div>
+						  </form>
+						</div>
+					  </div>
+					  <!-- END -->
 
 
 

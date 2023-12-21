@@ -132,22 +132,15 @@ class ImportController extends Controller
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
 
-                // $rasponse=DB::table('stock')->delete();
-                // if($rasponse){
+                $rasponse=DB::table('stock')->delete();
                     $path = $request->file('upload_csv');
                     Excel::import(new importUser,$path);
 
-                    $delayInSeconds = 30;
-                    sleep($delayInSeconds);
+                    // $delayInSeconds = 30;
+                    // sleep($delayInSeconds);
 
-                    // Excel::filter('chunk')->import(new importUser, $path);
                     Session::flash('message', 'Excel Information Successfully saved.');
                     return redirect('stock');
-                // }else{
-                //     Session::flash('message', 'Tecnical issue Excel Information Not Upload.');
-                //     return redirect('stock');
-                // }
-
             }else {
                 return redirect('/');
             }
@@ -165,11 +158,11 @@ class ImportController extends Controller
                 ->get();
 
                 $data['sales_rs'] =DB::table('sales')->select(
-                        DB::raw('SUM(quantity) as total_quantity'),
-                        DB::raw('sku as barcode'),
+                        DB::raw('SUM(bill_quantity) as total_quantity'),
+                        DB::raw('barcode as barcode'),
                         DB::raw('date as date')
                     )
-                    ->groupBy(DB::raw('sku'))
+                    ->groupBy(DB::raw('barcode'))
                     ->get();
 
 
