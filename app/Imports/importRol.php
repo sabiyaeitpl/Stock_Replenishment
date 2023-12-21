@@ -4,8 +4,10 @@ namespace App\Imports;
 
 use App\Models\rolsModel;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Contracts\Queue\ShouldQueue; 
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class importRol implements ToModel
+class importRol implements ToModel ,WithChunkReading, ShouldQueue
 {
     /**
     * @param array $row
@@ -28,5 +30,9 @@ class importRol implements ToModel
             'mrp'=>$row[10],
             'quantity'=>$row[11],
         ]);
+    }
+    public function chunkSize(): int
+    {
+        return 1000;
     }
 }

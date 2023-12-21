@@ -151,20 +151,14 @@ function my_simple_crypt($string, $action = 'encrypt')
         <!-- Modal -->
         <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
 						<div class="modal-dialog" role="document">
-						  <form style='padding: 0px;' action="#" method="post" enctype="multipart/form-data">
+						  <form style='padding: 0px;' action="{{url('add-stock')}}" method="post" enctype="multipart/form-data">
 							  @csrf
 							  <div class="modal-content">
-								<!--<div class="modal-header">-->
-								<!--  <h5 class="modal-title" id="exampleModalLabel">Import Excel</h5>-->
-								<!--  <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
-								<!--    <span aria-hidden="true">&times;</span>-->
-								<!--  </button>-->
-								<!--</div>-->
 								<div class="modal-body">
 								  
 									<div class="form-group">
 									  <label for="excel_file">Upload Stock Details CSV</label>
-									  <input type="file" name="excel_file" class="form-control" style='height: 40px;' id="excel_file">
+									  <input type="file" id="upload_csv" name="upload_csv" required class="form-control-file">
 									</div>
 								  
 								</div>

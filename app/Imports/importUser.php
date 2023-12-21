@@ -4,7 +4,7 @@ namespace App\Imports;
 
 use App\Models\importUserModel;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Illuminate\Contracts\Queue\ShouldQueue; // Fix the case here
+use Illuminate\Contracts\Queue\ShouldQueue; 
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class importUser implements ToModel, WithChunkReading, ShouldQueue
