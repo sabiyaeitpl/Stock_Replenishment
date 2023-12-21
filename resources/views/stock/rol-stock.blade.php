@@ -1,6 +1,6 @@
 @extends('stock.layouts.master')
 @section('title')
-Stock Information 
+Stock Information
 @endsection
 
 @section('sidebar')
@@ -104,8 +104,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
-                                    <th>Sku</th>
-                                    <th>Date</th>
+                                    <th>Barcode</th>
                                     <th>Total Quantity</th>
                                     <th>Roll Quantity</th>
                                 </tr>
@@ -115,11 +114,10 @@ function my_simple_crypt($string, $action = 'encrypt')
                                 @foreach($item as $itex)
                                 <tr>
                                     <td>{{ $loop->iteration}}</td>
-                                    <td>{{ $itex->sku }}</td>
-                                    <td>{{ $itex->date }}</td>
-                                    <td>{{ $itex->quantity }}</td>
+                                    <td>{{ $itex->barcode }}</td>
+                                    <td>{{ $itex->stock_quantity }}</td>
                                     <td>{{ $itex->rol_quantity }}</td>
-                                   
+
                                 </tr>
                                 @endforeach
                                 @endforeach

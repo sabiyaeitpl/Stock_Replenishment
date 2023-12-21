@@ -312,26 +312,25 @@ class ImportController extends Controller
                 });
         })
         ->groupBy('sales.sku')
-        ->orderByDesc('total_sales_quantity') // Order by quantity in descending order
+        ->orderByDesc('total_sales_quantity')
         ->get();
-    // dd($results);
-    $data['rolValue'] = [];
-    foreach ($results as $item) {
-        $quantity = (int)$item->rol_quantity;
-        $response = DB::table('stock')
-            ->select('stock.*', 'rol.quantity as rol_quantity')
-            ->join('rol', 'stock.barcode', '=', 'rol.sku')
-            ->where('stock.barcode', $item->sku)
-            ->where('stock.stock_quantity','<',$quantity)
-            ->get();
-        if ($response->isNotEmpty()) {
-            $data['rolValue'][] = $response;
+        $data['rolValue'] = [];
+        foreach ($results as $item) {
+            $quantity = (int)$item->rol_quantity;
+            $response = DB::table('stock')
+                ->select('stock.*', 'rol.quantity as rol_quantity')
+                ->join('rol', 'stock.barcode', '=', 'rol.sku')
+                ->where('stock.barcode', $item->sku)
+                ->where('stock.stock_quantity','<',$quantity)
+                ->get();
+            if ($response->isNotEmpty()) {
+                $data['rolValue'][] = $response;
+            }
         }
-    }
-    return view('stock/rol-stock',$data);
+        return view('stock/rol-stock',$data);
 
-        }else {
-            return redirect('/');
+            }else {
+                return redirect('/');
+            }
         }
-    }
 }

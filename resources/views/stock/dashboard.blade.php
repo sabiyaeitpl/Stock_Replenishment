@@ -1,154 +1,114 @@
 @extends('stock.layouts.master')
-
 @section('title')
-stock Dashboard
+Stock Information
 @endsection
 
 @section('sidebar')
-	@include('stock.partials.sidebar')
+@include('stock.partials.sidebar')
 @endsection
 
 @section('header')
-	@include('stock.partials.header')
+@include('stock.partials.header')
 @endsection
 
 
-
-@section('scripts')
-	@include('stock.partials.scripts')
-@endsection
 
 @section('content')
 <style>
-.dash-mar h2 {background: linear-gradient(to right, #28ca8e 30% , #0aa3de);color: #fff;padding: 5px 10px;margin-top: 15px;font-size: 23px;}
-.single-chart {width: 40%;justify-content: space-around ;}
-.circular-chart {display: block;margin: 10px auto 0;max-width: 80%;max-height: 250px;float:left;}
-.circle-bg {fill: none;stroke: #eee;stroke-width: 3.8;}
-.circle {fill: none;stroke-width: 4;stroke-linecap: round;animation: progress 4s ease-out forwards;}
-@keyframes progress {0% {stroke-dasharray: 0 100;}}
-.circular-chart.orange .circle {stroke: #ff9f00;}
-.circular-chart.green .circle {stroke: #9e5df7;}
-.circular-chart.blue .circle {stroke: #a203a7;}
-.circular-chart.grn .circle {stroke: green;}
-.circular-chart.red .circle {stroke: #ea3009;}
-.circular-chart.sky .circle {stroke: #06bce2;}
-.percentage {fill: #666;font-family: sans-serif;font-size: 0.5em;text-anchor: middle;}
-.dib{margin-top:15px;}
-#chart{width: 700px;height: 450px;margin: 0 auto;border: 1px solid #000;}
+    .right-panel {
 
-table tr th{
-    color: #c75b0b;
-	 font-weight: normal;
-	 padding: 10px 20px;
+    margin-top: 93px;
 }
-table tr td{
-padding: 10px 20px !important;
-    font-size: 13px;
-}
-td{vertical-align:middle !important;}
-td.wish{vertical-align:middle;}
-.wish a {
-    background: #ef0c34;
-    color: #fff;
-    padding: 7px 10px;
-    border-radius: 4px;
-    border: 2px solid #ef0c34;
-    transition: 1s;
-}
-.wish:hover a{color:#ef0c34;background:transparent;}
-.incre a {
-    background: #099a29;
-    color: #fff;
-    padding: 7px 13px;
-    font-size: 14px;
-    border-radius: 4px;
-	border:2px solid #099a29;transition:1s;
-}
-.incre:hover a{color:#099a29;background:transparent;}
-table tr:nth-child(even) {background: #ecf6f9;}
-table tr th{padding: 10px 20px !important;}
-table tr:last-child{border-bottom:none;}
-/***********************blink******************/
-/* Firefox old*/
-@-moz-keyframes blink {
-    0% {
-        opacity:1;
-    }
-    50% {
-        opacity:0;
-    }
-    100% {
-        opacity:1;
-    }
-} 
-
-@-webkit-keyframes blink {
-    0% {
-        opacity:1;
-    }
-    50% {
-        opacity:0;
-    }
-    100% {
-        opacity:1;
-    }
-}
-/* IE */
-@-ms-keyframes blink {
-    0% {
-        opacity:1;
-    }
-    50% {
-        opacity:0;
-    }
-    100% {
-        opacity:1;
-    }
-} 
-/* Opera and prob css3 final iteration */
-@keyframes blink {
-    0% {
-        opacity:1;
-    }
-    50% {
-        opacity:0;
-    }
-    100% {
-        opacity:1;
-    }
-} 
-.blink-image {
-    -moz-animation: blink normal 1s infinite ease-in-out; /* Firefox */
-    -webkit-animation: blink normal 1s infinite ease-in-out; /* Webkit */
-    -ms-animation: blink normal 1s infinite ease-in-out; /* IE */
-    animation: blink normal 1s infinite ease-in-out;
-	    width: 37px;
-}
-.birthday tr:nth-child(even) {
-    background: #f7f2f7 !important;
-}
-/**************************************/
+.card form {
+    	padding: 19px 0 0 0;
+        background:none;
+	}
 </style>
- <!-- Content -->
-        <div class="content">
+<div class="content">
+    <!-- Animated -->
+    <div class="animated fadeIn">
+        <div class="row" style="border:none;">
+            <div class="col-md-6">
+                <h5 class="card-title">Dashboard</h5>
+            </div>
+            <div class="col-md-6">
+                <span class="right-brd" style="padding-right:15x;">
+                    <ul class="">
+                        <li><a href="#">Dashboard</a></li>
 
-        	<div class="animated fadeIn">
-      <!-- privious month detail  -->
-      <div class="dash-mar">
-	  
-	  <div class="row">
-	 
-       </div> 
-      </div>
-      <!-- /privious month detail -->
-	  
-	 <!----birthday-reminder--------------> 
-	
-           
-		</div>
-        <!-- /.content -->
-        <div class="clearfix"></div>
-       
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <!-- Widgets  -->
+        <div class="row">
+
+            <div class="main-card">
+                <div class="card">
+                    <br />
+                    <div class="clear-fix">
+                        <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Store Name.</th>
+                                    <th>Barcode</th>
+                                    <th>Stock Quantity</th>
+                                    <th>ROL Quantity</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rolValue as $item)
+                                @foreach($item as $itex)
+                                <tr>
+                                    <td>{{ $loop->iteration}}</td>
+                                    <td>{{ $itex->name }}</td>
+                                    <td>{{ $itex->barcode }}</td>
+                                    <td>{{ $itex->stock_quantity }}</td>
+                                    <td>{{ $itex->rol_quantity }}</td>
+                                    <?php
+                                        $stock_quantity = $itex->stock_quantity;
+                                        $rol_quantity = $itex->rol_quantity;
+                                        $diff_quantiy = ($rol_quantity - $stock_quantity);
+                                    ?>
+                                    @if ($diff_quantiy > 2)
+                                    <td style="text-align: center;"><img src="{{asset('theme/Z16w.gif')}}" alt="" style="width: 40px;height:40px"></td>
+                                    @else
+                                    <td style="text-align: center;"><img src="{{asset('theme/alert1.png')}}" alt="" style="width: 40px;height:40px"></td>
+                                    @endif
 
 
+                                </tr>
+                                @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+        <!-- /Widgets -->
+
+
+
+    </div>
+    <!-- .animated -->
+</div>
+<!-- /.content -->
+<?php //include("footer.php");
+?>
+</div>
+<!-- /#right-panel -->
+
+@endsection
+@section('scripts')
+@include('stock.partials.scripts')
 @endsection

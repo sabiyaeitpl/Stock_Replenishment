@@ -20,7 +20,7 @@ use Route;
  */
 
  //import controller route
- Route::get('stock/dashboard', 'import\ImportController@viewdashboard');
+//  Route::get('stock/dashboard', 'import\ImportController@viewdashboard');
  Route::get('stock', 'import\ImportController@getStock');
  Route::get('sales', 'import\ImportController@getSales');
  Route::get('add-sales', 'import\ImportController@viewAddSales');
@@ -29,6 +29,9 @@ use Route;
  Route::post('add-stock', 'import\ImportController@importExcel');
  Route::post('add-rol', 'import\ImportController@importRolExcel');
  Route::get('compare','import\ImportController@salesCompare');
+
+ //Stock Controller
+ Route::get('stock/dashboard', 'Stock\StockController@viewdashboard');
 
  //Rol Route
  Route::get('stock/rol', 'Stock\RolController@getRol');
@@ -43,7 +46,7 @@ use Route;
 //******* Routes with Login  start *********//
 Route::get('/', 'HomeController@getlogin');
 Route::post('/login', 'HomeController@DoLogin');
-Route::get('dashboard', 'HomeController@Dashboard');
+Route::get('dashboard', 'Stock\StockController@viewdashboard');
 Route::get('change-password', 'HomeController@changepassword');
 Route::post('save-change-password', 'HomeController@savechangepassword');
 Route::get('logout', 'HomeController@Logout');
