@@ -54,13 +54,14 @@ class StockController extends Controller
         ->groupBy('sales.barcode')
         ->orderByDesc('total_sales_quantity')
         ->get();
+        // dd($results);
         $data['rolValue'] = [];
         foreach ($results as $item) {
             $quantity = (int)$item->rol_quantity;
             $response = DB::table('stock')
                 ->select('stock.*', 'rol.quantity as rol_quantity')
                 ->join('rol', 'stock.barcode', '=', 'rol.sku')
-                ->where('stock.barcode', $item->sku)
+                ->where('stock.barcode', $item->barcode)
                 ->where('stock.stock_quantity','<',$quantity)
                 ->get();
             if ($response->isNotEmpty()) {

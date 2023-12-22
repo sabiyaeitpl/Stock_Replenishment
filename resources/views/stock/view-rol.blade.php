@@ -21,6 +21,9 @@ Stock Information
    padding: 19px 0 0 0;
    background:none;
    }
+   .aply-lv a {
+    padding: 8px 14px;
+}
 </style>
 <div class="content">
    <!-- Animated -->
@@ -43,13 +46,17 @@ Stock Information
       <div class="row">
          <div class="main-card">
             <div class="card">
-               <div class="card-header">
+               <div class="card-header pb-3">
                   <div class="aply-lv">
-                     <a href="{{ url('stock/add-rol') }}" class="btn btn-default" style="float:right;">Add ROL <i class="fa fa-plus"></i></a>
+                  <button type="button" class="btn btn-primary mx-1" title="Import Rol Details" style="float:right" data-toggle="modal" data-target="#exampleModal1">
+                            Import Rol
+                     </button>
+                  <!-- <a href="{{ url('stock/add-rol') }}" class="btn btn-default" style="float:right;">Import Rol <i class="fa fa-plus"></i></a> -->
+                     <a href="{{ url('stock/add-rol') }}" class="btn btn-primary" style="float:right;">Add ROL <i class="fa fa-plus"></i></a>
                      @if(count($sales_rs)>0)
                      <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button>
+                        <!-- <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button> -->
                      </form>
                      @endif
                   </div>
@@ -91,4 +98,28 @@ Stock Information
    </div>
 </div>
 </div>
+
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+						  <form style='padding: 0px;' action="{{url('add-rol')}}" method="post" enctype="multipart/form-data">
+							  @csrf
+							  <div class="modal-content">
+								<div class="modal-body">
+								  
+									<div class="form-group">
+									  <label for="excel_file">Upload Rol Details CSV</label>
+									  <input type="file" id="upload_csv" name="rol_csv" required class="form-control-file">
+									</div>
+								  
+								</div>
+								<div class="modal-footer">
+								  <button type="button" class="btn btn-secondary" style="padding: 0px 8px;height: 32px;" data-dismiss="modal">Close</button>
+								  <button type="submit" class="btn btn-primary" style="color: #fff;background-color: #0884af;border-color: #0884af;padding: 0px 8px;height: 32px;">Import</button>
+								</div>
+							  </div>
+						  </form>
+						</div>
+					  </div>
+					  <!-- END -->
 @endsection

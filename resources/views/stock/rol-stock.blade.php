@@ -53,14 +53,14 @@ function my_simple_crypt($string, $action = 'encrypt')
     <div class="animated fadeIn">
         <div class="row" style="border:none;">
             <div class="col-md-6">
-                <h5 class="card-title">Sales Master</h5>
+                <h5 class="card-title">Report</h5>
             </div>
             <div class="col-md-6">
                 <span class="right-brd" style="padding-right:15x;">
                     <ul class="">
-                        <li><a href="#">Sales</a></li>
+                        <li><a href="#">Report</a></li>
                         <li>/</li>
-                        <li class="active">Sales Master</li>
+                        <li class="active">Report</li>
 
                     </ul>
                 </span>
@@ -74,17 +74,17 @@ function my_simple_crypt($string, $action = 'encrypt')
 
                     <div class="card-header">
                     <div class="aply-lv">
-                        <a href="{{ url('add-sales') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a>
+                        <!-- <a href="{{ url('add-sales') }}" class="btn btn-default" style="float:right;">Add Import Master <i class="fa fa-plus"></i></a> -->
                         @if(count($rolValue)>0)
                         <form  method="post" action="{{ url('xls-export-employees') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button>
+											<!-- <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit"><img  style="width: 35px;" src="{{ asset('img/excel-dnld.png')}}"></button> -->
 												</form>
                                 <form  method="post" action="{{ url('xls-export-employee-only') }}" enctype="multipart/form-data" >
 											<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-											<button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Sales Data Only</button>
+											<!-- <button data-toggle="tooltip" data-placement="bottom" title="Download Excel" class="btn btn-default" style="background:none !important;padding: 10px 15px;margin-top: -30px;float:right;margin-right: 15px;" type="submit">Sales Data Only</button> -->
 												</form>
                         @endif
                     </div>

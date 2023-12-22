@@ -17,7 +17,7 @@
            
 
             <div class="user-area dropdown float-right">
-                <a style="display: block;overflow: hidden;float:left;padding: 20px 15px 0 0;" class="home" href="{{url('dashboard')}}"><img style="width:23px;" src="{{ asset('images/home.png') }}" alt="Logo"></a>
+                <a style="display: block;overflow: hidden;float:left;padding: 20px 15px 0 0;" class="home" href="{{url('dashboard')}}"><img style="width:23px;" src="{{ asset('public/images/home.png') }}" alt="Logo"></a>
 
                 <a title="Logout" style="display: block;overflow: hidden;float:left;padding: 25px 15px 0 0;" class="home" href="{{url('logout')}}"><img style="width:25px;" src="{{ asset('theme/images/logout.png') }}" alt="Logo"></a>
 

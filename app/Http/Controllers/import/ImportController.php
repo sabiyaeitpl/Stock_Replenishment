@@ -136,8 +136,8 @@ class ImportController extends Controller
                     $path = $request->file('upload_csv');
                     Excel::import(new importUser,$path);
 
-                    // $delayInSeconds = 30;
-                    // sleep($delayInSeconds);
+                    $delayInSeconds = 30;
+                    sleep($delayInSeconds);
 
                     Session::flash('message', 'Excel Information Successfully saved.');
                     return redirect('stock');
@@ -213,6 +213,9 @@ class ImportController extends Controller
 
                 $path = $request->file('upload_csv');
                 Excel::import(new importSales,$path);
+
+                   $delayInSeconds = 30;
+                    sleep($delayInSeconds);
                 Session::flash('message', 'Excel Information Successfully saved.');
                 return redirect('sales');
             }else {
@@ -275,10 +278,12 @@ class ImportController extends Controller
                 //         'upload_csv.mimes' => 'File Must Be XLSX format!']
                 // );
 
-                $path = $request->file('upload_csv');
+                $path = $request->file('rol_csv');
                 Excel::import(new importRol,$path);
+                   $delayInSeconds = 30;
+                    sleep($delayInSeconds);
                 Session::flash('message', 'Excel Information Successfully saved.');
-                return redirect('rol');
+                return redirect('stock/rol');
             }else {
                 return redirect('/');
             }
@@ -313,7 +318,7 @@ class ImportController extends Controller
             $response = DB::table('stock')
                 ->select('stock.*', 'rol.quantity as rol_quantity')
                 ->join('rol', 'stock.barcode', '=', 'rol.sku')
-                ->where('stock.barcode', $item->sku)
+                ->where('stock.barcode', $item->barcode)
                 ->where('stock.stock_quantity','<',$quantity)
                 ->get();
             if ($response->isNotEmpty()) {

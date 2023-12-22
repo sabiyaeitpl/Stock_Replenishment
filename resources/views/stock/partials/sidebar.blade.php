@@ -39,7 +39,7 @@
                             <li><a href="{{ url('stock') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Stock List</a></li>
                             <li><a href="{{ url('sales') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Sales List</a></li>
                             <li><a href="{{ url('stock/rol') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Rol List</a></li>
-                            <li><a href="{{ url('compare') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" /> Product Compare</a></li>
+                            <li><a href="{{ url('compare') }}"><img src="{{ asset('images/lv-rule.png') }}" alt="" />Report</a></li>
                         </ul>
                     </li>
                 </ul>
