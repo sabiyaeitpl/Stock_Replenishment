@@ -11,6 +11,8 @@ use App\Models\Attendance\Upload_attendence;
 use App\Models\Attendance\Process_attendance;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use View;
 use Validator;
 use Session;
@@ -20,6 +22,8 @@ use Illuminate\Support\Facades\Hash;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Response;
+
 
 use App\Imports\importUser;
 use App\Imports\importSales;
@@ -32,6 +36,24 @@ use App\Models\rolsModel;
 use DB;
 class ImportController extends Controller
 {
+    public function paginate($items,$perPage=4,$page=null){
+      
+        $page=$page ?:(Paginator::resolveCurrentPage()?:1);
+        $total=count($items);
+        $currentpage=$page;
+        $offset=($currentpage * $perPage)- $perPage;
+        $itemstoshow=array_slice($items ,$offset,$perPage);
+        return new LengthAwarePaginator($itemstoshow,$total,$perPage);
+    }
+
+    // public function demo(){
+    //     $books=Book::get()->toArray();
+    //     $books=$this->paginate($books,2)
+    //     $books->path('');
+
+    //     return View('stock/dashboard', $data);
+    // }
+
 	public function viewdashboard()
     {
         if (!empty(Session::get('admin'))) {
@@ -84,14 +106,25 @@ class ImportController extends Controller
                 ->where('member_id', '=', $email)
                 ->get();
 
-            $data['employee_rs'] = importUserModel::get();
-
-            // dd($data['employee_rs']);
+                $data['employee_rs']=importUserModel::get()->toArray();
+                $data['employee_rs']=$this->paginate($data['employee_rs'],10);
+                $data['employee_rs']->path('');
+                
             return view('stock.view-stock', $data);
         } else {
             return redirect('/');
         }
     }
+
+    public function getSearchValue($value){
+        $data=importUserModel::where('name','LIKE','%'.$value.'%')
+        ->orWhere('barcode','LIKE','%'.$value.'%')
+        ->get();
+        return Response::json($data);
+    }
+   
+
+
     public function viewAddStock()
     {
 
@@ -326,8 +359,7 @@ class ImportController extends Controller
             }
         }
         return view('stock/rol-stock',$data);
-
-            }else {
+            }else{
                 return redirect('/');
             }
         }

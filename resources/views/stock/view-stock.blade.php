@@ -107,6 +107,12 @@ function my_simple_crypt($string, $action = 'encrypt')
                     
 
                     <div class="clear-fix">
+                        <div class="col-md-3 text-right">
+                        <div class="form-group">
+                            <label for="search" class="sr-only">Search</label>
+                            <input type="text" class="form-control" id="search" placeholder="Search" oninput="searchFunction()">
+                        </div>
+                        </div>
                         <table id="bootstrap-data-table" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -119,28 +125,29 @@ function my_simple_crypt($string, $action = 'encrypt')
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="stocktable">
                                 @foreach($employee_rs as $employee)
                                 <tr>
                                     <td>{{ $loop->iteration}}</td>
-                                    <td>{{ $employee->name}}</td>
-                                    <td>{{ $employee->division}}</td>
-                                    <td>{{ $employee->section}}</td>
-                                    <td>{{ $employee->department }}</td>
-                                    <td>{{ $employee->barcode }}</td>
-                                    <td>{{ $employee->stock_quantity }}</td>
+                                    <td>{{ $employee['name']}}</td>
+                                    <td>{{ $employee['division']}}</td>
+                                    <td>{{ $employee['section']}}</td>
+                                    <td>{{ $employee['department'] }}</td>
+                                    <td>{{ $employee['barcode'] }}</td>
+                                    <td>{{ $employee['stock_quantity'] }}</td>
                                    
                                 </tr>
                                 @endforeach
                             </tbody>
+                            <tbody id="stockbed"></tbody>
                         </table>
-
-
+                    {!! $employee_rs->links() !!}
                     </div>
 
                 </div>
 
             </div>
+          
 
 
 
@@ -177,6 +184,40 @@ function my_simple_crypt($string, $action = 'encrypt')
     </div>
     <!-- .animated -->
 </div>
+<script>
+  function searchFunction() {
+    var value = $("#search").val();
+    
+    $.ajax({
+        url: "{{url('stock/get-search-value')}}" + '/' + value,
+        type: "GET",
+        success: function (response) {
+            // Clear existing rows in the table
+            $("#stocktable").hide();
+            $("#stockbed").empty();
+
+            // Loop through the response and append rows to the table
+            response.forEach(function (item) {
+                $("#stockbed").append(`
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.division}</td>
+                        <td>${item.section}</td>
+                        <td>${item.department}</td>
+                        <td>${item.barcode}</td>
+                        <td>${item.stock_quantity}</td>
+                    </tr>
+                `);
+            });
+        },
+        error: function (error) {
+            console.error("Error in AJAX request:", error);
+        }
+    });
+}
+
+</script>
 <!-- /.content -->
 <?php //include("footer.php");
 ?>

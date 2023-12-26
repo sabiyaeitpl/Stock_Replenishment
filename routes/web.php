@@ -29,6 +29,8 @@ use Route;
  Route::post('add-stock', 'import\ImportController@importExcel');
  Route::post('add-rol', 'import\ImportController@importRolExcel');
  Route::get('compare','import\ImportController@salesCompare');
+ Route::get('stock/get-search-value/{value}','import\ImportController@getSearchValue');
+ 
 
  //Stock Controller
  Route::get('stock/dashboard', 'Stock\StockController@viewdashboard');
