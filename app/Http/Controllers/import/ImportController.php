@@ -37,7 +37,6 @@ use DB;
 class ImportController extends Controller
 {
     public function paginate($items,$perPage=4,$page=null){
-      
         $page=$page ?:(Paginator::resolveCurrentPage()?:1);
         $total=count($items);
         $currentpage=$page;
@@ -46,14 +45,7 @@ class ImportController extends Controller
         return new LengthAwarePaginator($itemstoshow,$total,$perPage);
     }
 
-    // public function demo(){
-    //     $books=Book::get()->toArray();
-    //     $books=$this->paginate($books,2)
-    //     $books->path('');
-
-    //     return View('stock/dashboard', $data);
-    // }
-
+    
 	public function viewdashboard()
     {
         if (!empty(Session::get('admin'))) {
@@ -118,6 +110,14 @@ class ImportController extends Controller
 
     public function getSearchValue($value){
         $data=importUserModel::where('name','LIKE','%'.$value.'%')
+        ->orWhere('barcode','LIKE','%'.$value.'%')
+        ->get();
+        return Response::json($data);
+    }
+
+
+    public function getselchvalueAjax($value){
+        $data=salesModel::where('name','LIKE','%'.$value.'%')
         ->orWhere('barcode','LIKE','%'.$value.'%')
         ->get();
         return Response::json($data);
@@ -196,12 +196,11 @@ class ImportController extends Controller
                         DB::raw('date as date')
                     )
                     ->groupBy(DB::raw('barcode'))
-                    ->get();
+                    ->get()->toArray();
 
+                    $data['sales_rs']=$this->paginate($data['sales_rs'],10);
+                    $data['sales_rs']->path('');
 
-            // $data['sales_rs'] = salesModel::get();
-
-            // dd($data['employee_rs']);
             return view('stock.view-sales', $data);
         } else {
             return redirect('/');
@@ -323,44 +322,99 @@ class ImportController extends Controller
     }
 
 
-    public function salesCompare(){
+    public function salesCompare()
+    {
         if (!empty(Session::get('admin'))) {
-
             $data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
-            ->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
-            ->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
-            ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
-            ->where('member_id', '=', Session::get('adminusernmae'))
-            ->get();
-
-        $results = DB::table('sales')
-        ->select('sales.barcode', DB::raw('SUM(sales.bill_quantity) as total_sales_quantity'), 'rol.quantity as rol_quantity', 'sales.date')
-        ->join('rol', function ($join) {
-            $join->on('sales.barcode', '=', 'rol.sku')
-                ->where(function ($query) {
-                    $query->where('sales.date', '<=', DB::raw('rol.effective_from'))
-                        ->orWhere('sales.date', '>=', DB::raw('rol.effective_to'));
-                });
-        })
-        ->groupBy('sales.barcode')
-        ->orderByDesc('total_sales_quantity')
-        ->get();
-        $data['rolValue'] = [];
-        foreach ($results as $item) {
-            $quantity = (int)$item->rol_quantity;
-            $response = DB::table('stock')
-                ->select('stock.*', 'rol.quantity as rol_quantity')
-                ->join('rol', 'stock.barcode', '=', 'rol.sku')
-                ->where('stock.barcode', $item->barcode)
-                ->where('stock.stock_quantity','<',$quantity)
+                ->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+                ->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+                ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+                ->where('member_id', '=', Session::get('adminusernmae'))
                 ->get();
-            if ($response->isNotEmpty()) {
-                $data['rolValue'][] = $response;
+    
+            $results = DB::table('sales')
+                ->select('sales.barcode', DB::raw('SUM(sales.bill_quantity) as total_sales_quantity'), 'rol.quantity as rol_quantity', 'sales.date')
+                ->join('rol', function ($join) {
+                    $join->on('sales.barcode', '=', 'rol.sku')
+                        ->where(function ($query) {
+                            $query->where('sales.date', '<=', DB::raw('rol.effective_from'))
+                                ->orWhere('sales.date', '>=', DB::raw('rol.effective_to'));
+                        });
+                })
+                ->groupBy('sales.barcode')
+                ->orderByDesc('total_sales_quantity')
+                ->get();
+    
+            $data['rolValue'] = [];
+    
+            foreach ($results as $item) {
+                $quantity = (int)$item->rol_quantity;
+                $response = DB::table('stock')
+                    ->select('stock.*', 'rol.quantity as rol_quantity')
+                    ->join('rol', 'stock.barcode', '=', 'rol.sku')
+                    ->where('stock.barcode', $item->barcode)
+                    ->where('stock.stock_quantity', '<', $quantity)
+                    ->get();
+    
+                if ($response->isNotEmpty()) {
+                    $data['rolValue'][] = $response->toArray();
+                }
             }
+    
+            // Paginate the array
+            $perPage = 10;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentPageItems = array_slice($data['rolValue'], ($currentPage - 1) * $perPage, $perPage);
+            $data['rolValue'] = new LengthAwarePaginator($currentPageItems, count($data['rolValue']), $perPage);
+            $data['rolValue']->setPath('');
+    
+            return view('stock/rol-stock', $data);
+        } else {
+            return redirect('/');
         }
-        return view('stock/rol-stock',$data);
-            }else{
-                return redirect('/');
+    }
+
+    public function getcomparevalue($value){
+        if (!empty(Session::get('admin'))) {
+            $data['Roledata'] = Role_authorization::leftJoin('modules', 'role_authorizations.module_name', '=', 'modules.id')
+                ->leftJoin('sub_modules', 'role_authorizations.sub_module_name', '=', 'sub_modules.id')
+                ->leftJoin('module_configs', 'role_authorizations.menu', '=', 'module_configs.id')
+                ->select('role_authorizations.*', 'modules.module_name', 'sub_modules.sub_module_name', 'module_configs.menu_name')
+                ->where('member_id', '=', Session::get('adminusernmae'))
+                ->get();
+    
+            $results = DB::table('sales')
+                ->select('sales.barcode', DB::raw('SUM(sales.bill_quantity) as total_sales_quantity'), 'rol.quantity as rol_quantity', 'sales.date')
+                ->join('rol', function ($join) {
+                    $join->on('sales.barcode', '=', 'rol.sku')
+                        ->where(function ($query) {
+                            $query->where('sales.date', '<=', DB::raw('rol.effective_from'))
+                                ->orWhere('sales.date', '>=', DB::raw('rol.effective_to'));
+                        });
+                })
+                ->groupBy('sales.barcode')
+                ->orderByDesc('total_sales_quantity')
+                ->get();
+    
+            $arrayValue = [];
+    
+            foreach ($results as $item) {
+                $quantity = (int)$item->rol_quantity;
+                $response = DB::table('stock')
+                    ->select('stock.*', 'rol.quantity as rol_quantity')
+                    ->join('rol', 'stock.barcode', '=', 'rol.sku')
+                    ->where('stock.barcode', $item->barcode)
+                    ->where('stock.stock_quantity', '<', $quantity)
+                    ->get();
+                //    dd($response);
+                if ($response->isNotEmpty()) {
+                    $arrayValue[] = $response;
+                }
             }
+        //    $valll= $arrayValue->whget();
+        //    dd($valll);
+            return Response::json($data['rolValue']);
+    
         }
+    }
 }

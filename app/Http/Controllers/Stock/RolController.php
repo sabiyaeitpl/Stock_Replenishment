@@ -6,13 +6,25 @@ use Illuminate\Http\Request;
 use App\Models\Masters\Role_authorization;
 use App\Models\rolsModel;
 use App\Models\Stock\Stock;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use View;
 use Validator;
 use Session;
+use Illuminate\Support\Facades\Response;
 
 
 class RolController extends Controller
 {
+    public function paginate($items,$perPage=4,$page=null){
+        $page=$page ?:(Paginator::resolveCurrentPage()?:1);
+        $total=count($items);
+        $currentpage=$page;
+        $offset=($currentpage * $perPage)- $perPage;
+        $itemstoshow=array_slice($items ,$offset,$perPage);
+        return new LengthAwarePaginator($itemstoshow,$total,$perPage);
+    }
+
     public function getRol(){
         if (!empty(Session::get('admin'))) {
 
@@ -24,12 +36,21 @@ class RolController extends Controller
                 ->where('member_id', '=', $email)
                 ->get();
 
-            $data['sales_rs'] = rolsModel::get();
+            $data['sales_rs'] = rolsModel::get()->toArray();
+            $data['sales_rs']=$this->paginate($data['sales_rs'],10);
+            $data['sales_rs']->path('');
 
             return view('stock/view-rol',$data);
         } else {
             return redirect('/');
         }
+    }
+
+    public function getrolAjaxValue($value){
+        $data=rolsModel::where('effective_from','LIKE','%'.$value.'%')
+        ->orWhere('sku','LIKE','%'.$value.'%')
+        ->get();
+        return Response::json($data);
     }
     public function addRol(){
         if (!empty(Session::get('admin'))) {
@@ -96,6 +117,7 @@ class RolController extends Controller
         // dd($data);
         return response()->json($data);
     }
+    
 
 
 }

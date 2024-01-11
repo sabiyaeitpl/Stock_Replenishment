@@ -30,6 +30,10 @@ use Route;
  Route::post('add-rol', 'import\ImportController@importRolExcel');
  Route::get('compare','import\ImportController@salesCompare');
  Route::get('stock/get-search-value/{value}','import\ImportController@getSearchValue');
+ Route::get('sales/get-search-value/{value}','import\ImportController@getselchvalueAjax');
+ Route::get('rol/get-rol-value/{value}','Stock\RolController@getrolAjaxValue');
+ Route::get('comapre/get-search-value/{value}','import\ImportController@getcomparevalue');
+ 
  
 
  //Stock Controller

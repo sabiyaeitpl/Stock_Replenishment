@@ -105,7 +105,18 @@ function my_simple_crypt($string, $action = 'encrypt')
                     </div> -->
                     <br />
                     <div class="clear-fix">
-                        <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                    <div class="col-sm-12 d-flex flex-row-reverse">
+                        <div>
+                            <label for="search" class="sr-only">Search</label>
+                            <input type="text" class="form-control" id="search" placeholder="Search" oninput="searchFunction()">
+                        </div>
+                    </div>
+                        <div class="col-md-3 text-right">
+                        <div class="form-group">
+                            
+                        </div>
+                        </div>
+                        <table id="bootstrap-data-table2" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
@@ -115,7 +126,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                                    
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="stocktable">
                              
                                 @foreach($sales_rs as $item)
                                 <tr>
@@ -127,6 +138,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                                 </tr>
                                 @endforeach
                             </tbody>
+                            <tbody id="stockbed"></tbody>
                         </table>
 
 
@@ -137,7 +149,7 @@ function my_simple_crypt($string, $action = 'encrypt')
             </div>
 
 
-
+            {!! $sales_rs->withPath('/sales/')->links() !!}
         </div>
         <!-- /Widgets -->
 
@@ -176,5 +188,36 @@ function my_simple_crypt($string, $action = 'encrypt')
 ?>
 </div>
 <!-- /#right-panel -->
+
+<script>
+  function searchFunction() {
+    var value = $("#search").val();
+    
+    $.ajax({
+        url: "{{url('sales/get-search-value')}}" + '/' + value,
+        type: "GET",
+        success: function (response) {
+            // Clear existing rows in the table
+            $("#stocktable").hide();
+            $("#stockbed").empty();
+
+            // Loop through the response and append rows to the table
+            response.forEach(function (item) {
+                $("#stockbed").append(`
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.barcode}</td>
+                        <td>${item.date}</td>
+                        <td>${item.total_quantity}</td>
+                    </tr>
+                `);
+            });
+        },
+        error: function (error) {
+            console.error("Error in AJAX request:", error);
+        }
+    });
+}
+</script>
 
 @endsection

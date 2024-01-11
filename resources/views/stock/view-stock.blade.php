@@ -113,7 +113,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                             <input type="text" class="form-control" id="search" placeholder="Search" oninput="searchFunction()">
                         </div>
                         </div>
-                        <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                        <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>
@@ -141,7 +141,7 @@ function my_simple_crypt($string, $action = 'encrypt')
                             </tbody>
                             <tbody id="stockbed"></tbody>
                         </table>
-                    {!! $employee_rs->links() !!}
+                        {!! $employee_rs->withPath('/stock/')->links() !!}
                     </div>
 
                 </div>
@@ -216,7 +216,6 @@ function my_simple_crypt($string, $action = 'encrypt')
         }
     });
 }
-
 </script>
 <!-- /.content -->
 <?php //include("footer.php");
